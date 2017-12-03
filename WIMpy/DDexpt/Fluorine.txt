@@ -1,0 +1,23 @@
+N_isotopes	1
+
+m_1	19
+frac_1	1.0
+N_p_1	9
+N_n_1	10
+J_1	0.5
+
+m_det	10
+exposure	365
+E_min	20
+E_max	50
+
+
+BG_level	1e-10
+dE	1e-10
+
+USE_BINNED_DATA	0
+bin_width	1e-6
+
+USE_DIR 1
+
+DATA_FORMAT	2

@@ -39,12 +39,12 @@ Nvals = 1001
 
 depth = 10.6
 #sigma_p = 1.575e-28
-sigma_p = 10**(-30.6)
+sigma_p = 10**(-29)
 m_x = 1e5
 
 verne.loadFFcorrections(m_x)
 
-gamma = np.pi
+gamma = 0.0
 vesc = 533.0
 v_e = np.sqrt(2)*156.0
 
@@ -92,6 +92,7 @@ for i in tqdm(range(Nvals-1, -1,-1)):
     
 tcut = np.min(thetavals[v_final_lab > v_th]) + thetavals[1] - thetavals[0]
 vcut = np.max(v_final_lab)
+vmax = 1.0*vcut
 print tcut
 print vcut
 
@@ -144,10 +145,10 @@ end = timer()
 t1 = end - start
 
 #print simps(fint, tlist)
-#pl.figure()
-#pl.plot(tlist/np.pi, fint, '+')
-#pl.axvline(tcinterp(vtest)/np.pi, linestyle='--', color='k')
-#pl.show()
+pl.figure()
+pl.plot(tlist/np.pi, fint, '+')
+pl.axvline(tcinterp(vtest)/np.pi, linestyle='--', color='k')
+pl.show()
 
 print simps(fint, tlist), " (time taken:", t1, ")"
 

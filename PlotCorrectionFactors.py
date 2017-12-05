@@ -38,7 +38,7 @@ def ERmax(mX, mA, v):
 print 1e6*ERmax(1e10, 0.9315*16, 750/3.0e5)
 print 1e6*ERmax(1e10, 0.9315*56, 750/3.0e5)
 
-m_x = 1e7
+m_x = 1e5
 
 v_vals = np.linspace(0.1, 800, 100)
 
@@ -98,12 +98,12 @@ pl.show()
 
 
 
-print " Calculating for Iron..."
+print " Calculating for Lead..."
 sig_corr_Fe = v_vals*0.0
 ER_corr_Fe = v_vals*0.0
 for i, v in enumerate(v_vals):
-    sig_corr_Fe[i] = quad(lambda x: DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 56), 0, 1)[0]
-    ER_corr_Fe[i] = quad(lambda x: 2.0*x*DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 56), 0, 1)[0]
+    sig_corr_Fe[i] = quad(lambda x: DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 207), 0, 1)[0]
+    ER_corr_Fe[i] = quad(lambda x: 2.0*x*DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 207), 0, 1)[0]
 
 print " Calculating for Oxygen..."
 sig_corr_O = v_vals*0.0
@@ -128,7 +128,7 @@ f, ax2 = pl.subplots(1)
 
 #Subplot 2 - recoil energy correction
 ax2.plot(v_vals,ER_corr_O, color='blue',label='O', linewidth=1.5)
-ax2.plot(v_vals,ER_corr_Fe, color='green', label='Fe', linewidth=1.5)
+ax2.plot(v_vals,ER_corr_Fe, color='green', label='Pb', linewidth=1.5)
 
 #ax2.plot(v_vals, 1-(v_vals/(800*2.1))**2, 'b--')
 #ax2.plot(v_vals, 1-(v_vals/(800*0.5))**2 , 'g--')

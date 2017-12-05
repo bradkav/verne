@@ -192,15 +192,15 @@ def calcFFcorrection(m_x, A0):
     corr_fact[0] = 1.0
     return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
 
-#Calculate the DM-nucleus cross section
-#which includes an extra factor of m_A/m_X
-#BJK: WHY??!
+#Calculate the DM-nucleus 'effective' cross section
+#which takes into account the average energy loss
 def effectiveXS(sigma_p, m_X, A):
     m_p = 0.9315 #Proton mass
     m_A = 0.9315*A
     mu_A = m_A*m_X/(m_A + m_X)
     mu_p = m_p*m_X/(m_p + m_X)
-    return sigma_p*(m_A/m_X)*(A**2)*(mu_A/mu_p)**2
+    
+    return sigma_p*(1.0/(m_X*m_A))*(A**2)*(mu_A**4/mu_p**2)
     
 
 def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp):

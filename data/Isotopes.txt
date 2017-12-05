@@ -7,4 +7,3 @@
 7	23	Sodium
 8	32	Sulfur
 10	27	Aluminium
-12	130	Xenon

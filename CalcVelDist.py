@@ -1,137 +1,103 @@
 import numpy as np
-import WIMpy.DMUtils as DMU
-from numpy import pi
-from scipy.integrate import quad, dblquad, trapz
-import verne_analytic as VA
-from verne_analytic import isoID
-from skmonaco import mcquad
-from timeit import default_timer as timer
+from scipy.interpolate import interp1d
+import verne
+import MaxwellBoltzmann as MB
+import argparse
 
-from tqdm import tqdm
+from matplotlib import pylab as pl
 
-#Matplotlib ------------
+#Parse the arguments!
+parser = argparse.ArgumentParser(description='...')
+parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
+parser.add_argument('-sigma_p','--sigma_p', help='DM-nucleon cross section, sigma_p in cm^2', type=float, required=True)
+parser.add_argument('-target','--target', help='Target to propagate through. `earth`, `atmos`, `shield` or `full`.', type=str, default="full")
+args = parser.parse_args()
+m_x = args.m_x
+sigma_p = args.sigma_p
+#gamma_by_pi = args.gamma_by_pi
+#gamma = np.pi*gamma_by_pi
+target = args.target
 
-import matplotlib as mpl
-font = { 'size'   : 14}
-mpl.rcParams['xtick.major.size'] = 5
-mpl.rcParams['xtick.major.width'] = 1
-mpl.rcParams['xtick.minor.size'] = 2
-mpl.rcParams['xtick.minor.width'] = 1
-mpl.rcParams['ytick.major.size'] = 5
-mpl.rcParams['ytick.major.width'] = 1
-mpl.rcParams['ytick.minor.size'] = 2
-mpl.rcParams['ytick.minor.width'] = 1
-mpl.rc('font', **font)
+#Stanford lab
+depth = 10.6 #metres
 
-import matplotlib.pyplot as pl
-#------------------------
+print "   "
+print "    Calculating for..."
+print "        m_x/GeV:", m_x
+print "        sigma_p/cm^2:", sigma_p
+#print "        gamma/pi:", gamma_by_pi
+print "        target:", target
+print " "
 
-VA.loadIsotopes()
-VA.loadPhiInterp()
+#Initialise verne
+verne.loadIsotopes()
+verne.loadFFcorrections(m_x)
 
-rvals = np.linspace(0.0,650e4, 1000)
+#Calculate the maximum initial speed as a function of incoming angle theta
+Nvals = 1001
+thetavals = np.linspace(0, np.pi, Nvals)
 
-#pl.figure()
-#pl.plot(rvals/637.1e4, VA.dens_interp[isoID["Fe"]](rvals))
-#pl.show()
-
-tvals = np.linspace(0, np.pi,100)
-#pl.figure()
-#pl.semilogy(tvals, VA.pathLength(1500, tvals))
-#pl.show()
-
-Deff = tvals*0.0
-Deff2 = tvals*0.0
-
-#for i, t in enumerate(tvals):
-#    Deff[i] = VA.calcDeff(1500, t, isoID["Fe"])
-    #Deff2[i] = VA.calcDeff(1500, t, isoID["O"])
-
-#pl.figure()
-#pl.semilogy(tvals/np.pi, Deff)
-#pl.semilogy(tvals/np.pi, Deff2)
-#pl.show()
-
-#print VA.effectiveXS(1e-28, 1e5, isoID["Fe"])
-
-Vinit = np.vectorize(VA.calcVinitial)
-
-eta_int = np.vectorize(VA.eta_integrand)
-
-#pl.figure()
-#pl.plot(tvals,Vinit(220, tvals, 1e-28, 1e5,  isoID["Fe"]))
-#pl.show()
-
-#vg, tg = np.meshgrid(v_vals, tvals, indexing='ij')
-#v_i = Vinit(vg, tg, 1e-29, 1e5,  isoID["Fe"])
-#etagrid = eta_int(vg, tg, 0, 1e-30, 1e5,  isoID["Fe"])
-
-#pl.figure()
-#pl.contourf(vg,tg,etagrid)
-#pl.colorbar()
-#pl.show()
+v_e = np.sqrt(2.0)*MB.sigmav
+vesc = MB.vesc
 
 
-"""
-pl.figure()
-pl.plot(v_vals,VA.calcVinitial(v_vals, np.pi/2.0+0.1, 1e-28, 1e5,  isoID["Fe"]))
-pl.show()
 
-pl.figure()
-pl.plot(v_vals,VA.calcVfinal(v_vals, np.pi, 1e-28, 1e5,  isoID["Fe"]))
-pl.show()
-"""
-print " Be careful about the ranges of my interpolation functions..."
-print " Must be a problem with my interpolation functions..."
+def getVelDist(gamma):
+    
+    print "        Calculating maximum final speed..."
+    a = 1.0
+    b = 2*v_e*(-np.sin(gamma)*np.sin(np.pi-thetavals) + np.cos(gamma)*np.cos(np.pi-thetavals))
+    c = v_e**2 - vesc**2
+    v_initial_max = (-b + np.sqrt(b**2 - 4*a*c))/(2.0*a)
 
-#start = timer()
-#print VA.eta_integrand(200, 0.1,  0, 1e-30, 1e5, isoID["Fe"])
-#end = timer()
-#print " Time taken: ", end - start
-mx = 1e5
+    #Calculate the maximum final speed as a function of incoming angle theta
+    v_final_max = 0.0*v_initial_max
+    for i in range(Nvals):
+        v_final_max[i] = verne.calcVfinal_full(v_initial_max[i], thetavals[i],  depth, sigma_p, m_x, target)
 
-#siglist = [-29.0, -28.0, -27.0]
-siglist = [-31.0, -30.0, -29.0]
-sigvals = 10**np.asarray(siglist)
-labs = [r'$\sigma_p = 10^{'+str(int(lsig))+'}$ cm$^2$' for lsig in siglist]
-#labs = [r'$s = 1$',r'$s = 10$', r'$s = 100$',r'$s = 1000$']
+    #Calculate interpolation function for max final speed
+    vmax = np.max(v_final_max)
+    if (vmax < 1.0):
+        return np.linspace(0, 1, 61), np.zeros(61)
+    vfinal_interp = interp1d(thetavals, v_final_max, kind='linear', bounds_error=False, fill_value=0)
+    
+    print "        Calculating final speed distribution..."
 
-Nvals = 5
+    #Tabulate values of speed distribution
+    v_th = 1.0 #Lowest speed to consider (don't go lower than 1 km/s, other the calculation of derivatives is messed up...)
 
+    #Generate a list of sampling values for v (with some very close to v_th)
+    vlist = np.logspace(np.log10(v_th), np.log10(0.25*vmax), 20)    #20
+    vlist = np.append(vlist, np.linspace(0.15*vmax, 0.99*vmax, 40)) #40
+    #vlist = np.linspace(v_th, 0.999*vmax, 50)
+    vlist = np.sort(vlist)
+    f_final = 0.0*vlist
+    for i in range(len(vlist)):
+        f_final[i] = verne.CalcF(vlist[i], gamma, depth, sigma_p, m_x, target, vfinal_interp)
 
-vlist = np.logspace(np.log10(1), np.log10(750), Nvals)
-print vlist
-flist = np.zeros((3, Nvals))
-for j in range(3):
-    for i in tqdm(range(Nvals)):
-        flist[j,i] = VA.CalcFullF_full(vlist[i], np.pi, 10.6, sigvals[j], mx, "earth", np.pi/2.0)
-        #print vlist[i], flist[j,i]
-    #print " I'm renormalising by fudging it!!!"
-    #norm1 = -np.trapz(vlist, flist[j,:])
-    #print norm1
-    #flist[j,:] /= norm1
+    #Add on the final point
+    vlist = np.append(vlist, vmax)
+    f_final = np.append(f_final, 0.0)
 
-#print flist[2,:]
+    return vlist, f_final
+    
+    
+#Loop over gamma values
+N_gamma = 11
+Nv = 61
+gamma_list = np.linspace(0, 1.0, N_gamma)
+vgrid = np.zeros((N_gamma, Nv))
+fgrid = np.zeros((N_gamma, Nv))
+for j in range(N_gamma):
+    print "    Calculating for gamma/pi = ", gamma_list[j],"..."
+    vgrid[j,:], fgrid[j,:] = getVelDist(gamma_list[j]*np.pi)
 
-fig,ax1= pl.subplots(1, figsize=(8,6))
-#ax1.errorbar(vlist[1:], fulleta, yerr=errorlist, fmt='^', color='g')
-ax1.plot(np.linspace(0,750,100), DMU.calcf_SHM(np.linspace(0,750,100)),'k--',linewidth=1.0, label="Free")
-for j in range(3):
-    print trapz(flist[j,1:],vlist[1:])
-    ax1.plot(vlist, flist[j,:],label=labs[j], linewidth=1.5)
-ax1.set_yscale('log')
+gamma_rep = np.repeat(gamma_list, Nv)
 
-ax1.axvline(DMU.vmin(10, 73, 1e5), linestyle=":", color='k')
+#Output to file
+fname = "results/veldists/f_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.1f}'.format(np.log10(sigma_p)) + ".txt"
+headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\ntarget: " + target
+headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
 
-ax1.set_title(r'$m_\chi = 10^5$ GeV')
-
-ax1.set_xlabel(r'$v$ [km/s]')
-ax1.set_ylabel(r'$f(v)$ [s/km]')
-
-#ax1.set_xlim(0, 750)
-ax1.set_ylim(1e-8, 5e-3)
-
-pl.legend(loc='best', fontsize=14.0)
-pl.savefig('plots/sigma_STAN_log.pdf', bbox_inches="tight")
-pl.show()
-
+np.savetxt(fname, np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()]), header=headertxt)
+    

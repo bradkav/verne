@@ -1,10 +1,10 @@
 import numpy as np
-import WIMpy.DMUtils as DMU
+#import WIMpy.DMUtils as DMU
 from numpy import pi
 from scipy.integrate import quad, dblquad, quadrature, simps
 from scipy.interpolate import interp1d
 import verne
-from skmonaco import mcquad
+#from skmonaco import mcquad
 from timeit import default_timer as timer
 
 import MaxwellBoltzmann as MB

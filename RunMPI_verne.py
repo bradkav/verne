@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from mpi4py import MPI
 from subprocess import call
+import numpy as np
+
 import sys
 
 import argparse
@@ -42,19 +44,20 @@ nprocs = comm.Get_size()
 rank = comm.Get_rank()
 
 #Sample between log10(sigma_p/cm^2) = -30.6...-27.6
-lsig_list = np.logspace(-30.6, -27.6, nprocs)
-lsig = lsig_list[rank]
+sig_list = np.logspace(-30.6, -27.6, nprocs)
+sig = sig_list[rank]
+#sig = 10**-27.9
 
 #Output file labelled by r_np and exposure index
-outfile = "outfiles/f_lmx" + '{0:.1f}'.format(np.log10(m_x)) + ".txt"
+outfile = "outputs/out_lmx" + '{0:.1f}'.format(np.log10(args.m_x)) + "_lsig" + '{0:.1f}'.format(np.log10(sig))+".txt"
 
 #Directory where the calc files are located
 myDir = "/home/kavanagh/verne/"
 cmd = "cd "+myDir+" ; python CalcVelDist.py "
 cmd += "-m_x " + str(args.m_x)
-cmd += "-sigma_p " + str(lsig)
-cmd += "-target " + str(args.target)
-cmd += ">> " + outfile
+cmd += " -sigma_p " + str(sig)
+cmd += " -target " + str(args.target)
+cmd += " >> " + outfile
 
 sts = call(cmd,shell=True)
 comm.Barrier()

@@ -1,5 +1,7 @@
 # Verne
 
+[![DOI](https://zenodo.org/badge/112917758.svg)](https://zenodo.org/badge/latestdoi/112917758)
+
 Verne is a python code for calculating the Earth-stopping effect for super-heavy Dark Matter (DM). 
 
 The code allows you to calculate the speed distribution (and DM signal rate) at two detector locations: MPI (the Max-Planck-Institute in Munich) and SUF (the Stanford Underground Facility). This can be done for a range of DM masses and cross sections (though the results will be most reliable for very heavy DM particles). Further details about the physics behind the code can be found in [arXiv:XXXXXX](https://arxiv.org/abs/XXXXX).

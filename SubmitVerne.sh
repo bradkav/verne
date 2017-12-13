@@ -1,7 +1,7 @@
 #PBS -lnodes=1:cores16:ppn=16
 #PBS -lwalltime=05:00:00
 
-cd $HOME/verne/
+cd $HOME/verne/src
 
 module load openmpi/gnu
 #module load python/2.7.9

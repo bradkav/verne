@@ -25,6 +25,7 @@ Niso_full = None
 phi_interp = None
 corr_interp = None
 corr_Pb = None
+corr_Cu = None
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
@@ -92,6 +93,7 @@ def loadIsotopes():
 def loadFFcorrections(m_x):
     global corr_interp
     global corr_Pb
+    global corr_Cu
     
     #Check that the isotope list has been loaded
     if (Avals is None):
@@ -99,8 +101,8 @@ def loadFFcorrections(m_x):
     
     print "    Calculating Form Factor corrections for m_x = ", m_x, " GeV..."
     corr_interp = [calcFFcorrection(m_x, Avals[ID]) for ID in range(Niso_full)]
-    corr_Pb = calcFFcorrection(m_x, 207) #Also need Lead, for the shielding
-
+    corr_Pb = calcFFcorrection(m_x, 207) #Also need Lead + Copper, for the shielding
+    corr_Cu = calcFFcorrection(m_x, 63.5)
     
 #International standard atmosphere, ISO 2533:1975
 #https://www.iso.org/standard/7472.html
@@ -270,13 +272,23 @@ def dv_by_dD(v, D, params):
     return -1e2*v*res #(km/s)/m
 
 
-def dv_by_dD_shield(v, D, params):        
+def dv_by_dD_Pb(v, D, params):        
     #Pb density
     n_Pb = 3.3e22
     A_Pb = 207
         
     sigma_p, m_x = params
     res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb)*corr_Pb(v)
+    return -1e2*v*res #(km/s)/m
+    
+def dv_by_dD_Cu(v, D, params):        
+    #Pb density
+    #n_Pb = 3.3e22
+    n_Cu = 8.5e22
+    A_Cu = 63.5
+        
+    sigma_p, m_x = params
+    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu)*corr_Cu(v)
     return -1e2*v*res #(km/s)/m
 
 def calcVfinal(v0, theta,  depth, sigma_p, m_x, target="full"):
@@ -298,12 +310,14 @@ def calcVfinal(v0, theta,  depth, sigma_p, m_x, target="full"):
     
 def calcVfinal_full(v0, theta,  depth, sigma_p, m_x, target="full"):
     vf = 1.0*v0
-    if (target == "atmos" or target == "full"):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="atmos")
-    if (target == "earth" or target == "full"):
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="earth") 
-    if (target == "shield" or target == "full"):
-        vf = calcVfinal_shield(vf, sigma_p, m_x)
+    if (target == "MPI"):
+        vf = calcVfinal_shield_MPI(vf, sigma_p, m_x)
+    if (target == "SUF"):
+        vf = calcVfinal_shield_SUF(vf, sigma_p, m_x)
     return vf
     
 def calcVinitial(v0, theta,  depth, sigma_p, m_x, target="earth"):
@@ -327,24 +341,39 @@ def calcVinitial(v0, theta,  depth, sigma_p, m_x, target="earth"):
     
 def calcVinitial_full(v0, theta,  depth, sigma_p, m_x, target="full"):
     vi = 1.0*v0
-    if (target == "shield" or target == "full"):
-        vi = calcVinitial_shield(vi, sigma_p, m_x)
-    if (target == "earth" or target == "full"):
+    if (target == "MPI"):
+        vi = calcVinitial_shield_MPI(vi, sigma_p, m_x)
+    if (target == "SUF"):
+        vi = calcVinitial_shield_SUF(vi, sigma_p, m_x)
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="earth")
-    if (target == "atmos" or target == "full"):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="atmos")
 
     return vi
     
-def calcVfinal_shield(v0, sigma_p, m_x):
+def calcVfinal_shield_SUF(v0, sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 16cm of Lead
-    psoln = odeint(dv_by_dD_shield, v0, [0,16.0e-2] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Pb, v0, [0,16.0e-2] , args=(params,), mxstep=1000, rtol=1e-6)
     return psoln[1]
     
-def calcVinitial_shield(v0,  sigma_p, m_x):
+def calcVinitial_shield_SUF(v0,  sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 16cm of Lead (backwards)
-    psoln = odeint(dv_by_dD_shield, v0, [16.0e-2,0] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Pb, v0, [16.0e-2,0] , args=(params,), mxstep=1000, rtol=1e-6)
     return psoln[1]
+
+def calcVfinal_shield_MPI(v0, sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 1mm Copper
+    psoln = odeint(dv_by_dD_Cu, v0, [0,1e-3] , args=(params,), mxstep=1000, rtol=1e-6)
+    return psoln[1]
+    
+def calcVinitial_shield_MPI(v0, sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 1mm Copper
+    psoln = odeint(dv_by_dD_Cu, v0, [1e-3,0] , args=(params,), mxstep=1000, rtol=1e-6)
+    return psoln[1]
+
     

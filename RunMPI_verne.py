@@ -34,6 +34,8 @@ parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
 #parser.add_argument('-sigma_p','--sigma_p', help='DM-nucleon cross section, sigma_p in cm^2', type=float, required=True)
 parser.add_argument('-target','--target', help='Target to propagate through. `earth`, `atmos`, `shield` or `full`.', type=str, default="full")
+parser.add_argument('-lsigstart', '--lsigstart', type=float, required=True)
+parser.add_argument('-lsigend', '--lsigend', type=float,required=True) 
 args = parser.parse_args()
 
 
@@ -44,19 +46,28 @@ nprocs = comm.Get_size()
 rank = comm.Get_rank()
 
 #Sample between log10(sigma_p/cm^2) = -30.6...-27.6
-sig_list = np.logspace(-30.6, -27.6, nprocs)
+#sig_list = np.logspace(-25.40, -22.40, nprocs)*(args.m_x/1e5)
+sig_list = np.logspace(args.lsigstart, args.lsigend, nprocs)
 sig = sig_list[rank]
 #sig = 10**-27.9
 
 #Output file labelled by r_np and exposure index
-outfile = "outputs/out_lmx" + '{0:.1f}'.format(np.log10(args.m_x)) + "_lsig" + '{0:.1f}'.format(np.log10(sig))+".txt"
+outfile = "outputs/out_"+args.target+"_lmx" + '{0:.1f}'.format(np.log10(args.m_x)) + "_lsig" + '{0:.2f}'.format(np.log10(sig))+".txt"
 
 #Directory where the calc files are located
 myDir = "/home/kavanagh/verne/"
 cmd = "cd "+myDir+" ; python CalcVelDist.py "
 cmd += "-m_x " + str(args.m_x)
 cmd += " -sigma_p " + str(sig)
-cmd += " -target " + str(args.target)
+cmd += " -loc " + str(args.target)
+cmd += " >> " + outfile
+
+if (args.target == "SUF"):
+    cmd += " ; python CalcRate_CDMS.py -m_x " + str(args.m_x)
+elif (args.target == "MPI"):
+    cmd += " ; python CalcRate_nucleus.py -m_x " + str(args.m_x)
+    
+cmd += " -sigma_p " + str(sig)
 cmd += " >> " + outfile
 
 sts = call(cmd,shell=True)

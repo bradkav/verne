@@ -10,23 +10,28 @@ from matplotlib import pylab as pl
 parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
 parser.add_argument('-sigma_p','--sigma_p', help='DM-nucleon cross section, sigma_p in cm^2', type=float, required=True)
-parser.add_argument('-target','--target', help='Target to propagate through. `earth`, `atmos`, `shield` or `full`.', type=str, default="full")
+parser.add_argument('-loc','--location', help='Detector location to consider. `MPI` or `SUF`', type=str, required=True)
 args = parser.parse_args()
 m_x = args.m_x
 sigma_p = args.sigma_p
 #gamma_by_pi = args.gamma_by_pi
 #gamma = np.pi*gamma_by_pi
-target = args.target
+loc = args.location
 
-#Stanford lab
-depth = 10.6 #metres
+if (loc == "SUF"):
+    depth = 10.6 #metres
+elif (loc == "MPI"):
+    depth = 0.3 #metres
+
+target = loc
+
 
 print "   "
 print "    Calculating for..."
 print "        m_x/GeV:", m_x
 print "        sigma_p/cm^2:", sigma_p
 #print "        gamma/pi:", gamma_by_pi
-print "        target:", target
+print "        detector at :", loc
 print " "
 
 #Initialise verne
@@ -95,8 +100,8 @@ for j in range(N_gamma):
 gamma_rep = np.repeat(gamma_list, Nv)
 
 #Output to file
-fname = "results/veldists/f_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.1f}'.format(np.log10(sigma_p)) + ".txt"
-headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\ntarget: " + target
+fname = "results/veldists/f_" + loc + "_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
+headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\nloc: " + target
 headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
 
 np.savetxt(fname, np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()]), header=headertxt)

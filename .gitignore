@@ -1,5 +1,6 @@
 backup/*
 .ipynb_checkpoints/*
+outputs/*
 *pyc
 SubmitVerne.sh.o*
 SubmitVerne.sh.e*

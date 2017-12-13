@@ -36,39 +36,16 @@ VA.loadPhiInterp()
 rvals = np.linspace(0.0,650e4, 1000)
 
 
-def getVelDist(lsigstr, vout, gamma):
-    Nvals = 50
-    Nthetavals = 10
+def getVelDist(lsigstr, gamma_ind):
+    Ngamvals = 11
+    Nvvals = 61
+    
+    rowvals = gamma_ind*61, 
 
-    vvals, tvals, vfvals = np.loadtxt("results/VT/VT_lsig=" + lsigstr + ".txt", unpack=True)
-    vigrid = vvals.reshape((Nthetavals,Nvals))
-    tgrid = tvals.reshape((Nthetavals,Nvals))
-    vfgrid = vfvals.reshape((Nthetavals,Nvals))
-
-    est = 0.0*np.zeros((Nthetavals,len(vout)))
-    for i in range(1,Nthetavals):
-        theta = tgrid[i,0]
-        #print theta
-        #pl.figure()
-        #print vfgrid[i,:]
-        #pl.plot(vfgrid[i,:], vigrid[i,:])
-        #pl.show()
-        intp = interp1d(vfgrid[i,:], vigrid[i,:], bounds_error=False, fill_value=0.0)
-        #pl.figure()
-        #pl.plot(vout, intp(vout))
-        #pl.show()
-        
-        dv = 1.0
-        va = np.clip(vout+dv/2.0, 0, 800)
-        vb = np.clip(vout-dv/2.0, 0, 800)
-        
-        deriv = np.abs(intp(va) - intp(vb))*1.0/(va-vb)
-        vilist = intp(vout)
-        
-        est[i,:] = (deriv)*np.sin(theta)*(vilist**2)*VA.calcf_integ(vilist, theta, gamma)
-        
-    print tgrid[:,0]
-    return trapz(est,tgrid[:,0], axis=0)
+    gamma_vals1, vvals1, fvals1 = np.loadtxt("results/veldists/f_MPI_lmx2.0_lsig" + lsigstr + ".txt", unpack=True)
+    vvals = vvals1[gamma_ind*61:(gamma_ind+1)*61]
+    fvals = fvals1[gamma_ind*61:(gamma_ind+1)*61]
+    return vvals, fvals
 
 
 
@@ -106,13 +83,7 @@ def getInterpFunc(lsigstr):
 
 #print tgrid
 
-v1 = np.linspace(0, 800, 100)
 
-fv1 = getVelDist("-30.0", v1, np.pi*(140.0/180))
-fv2 = getVelDist("-29.0", v1, np.pi*(140.0/180))
-fv3 = getVelDist("-28.0", v1, np.pi*(140.0/180))
-
-print fv1
 
 #fv1 = v1*0.0
 #fv2 = v1*0.0
@@ -134,18 +105,33 @@ print fv1
 #fv2 /= trapz(fv2, v1)
 #fv3 /= trapz(fv3, v1)
 
+v1 = np.linspace(0, 800, 100)
+
 fig,ax1= pl.subplots(1)
+slist = 10**np.linspace(-30.40,-27.40, 16)
+#print np.log10(slist)
+#slist = np.sort(np.append(slist, np.asarray([10**(-27.9), 10**(-27.8), 10**(-27.6)])))
+strlist = ['{0:.2f}'.format(np.log10(sigma_p)) for sigma_p in slist]
+#fname = "results/veldists/f_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.1f}'.format(np.log10(sigma_p)) + ".txt"
+
+
 ax1.plot(v1, DMU.calcf_SHM(v1),'k--',linewidth=1.5, label="Free")
-ax1.plot(v1, fv1, linewidth=2.0, label=r'$\sigma_p = 10^{-30}$ cm$^2$')
-ax1.plot(v1, fv2, linewidth=2.0, label=r'$\sigma_p = 10^{-29}$ cm$^2$')
-ax1.plot(v1, fv3, linewidth=2.0, label=r'$\sigma_p = 10^{-28}$ cm$^2$')
-ax1.axvline(DMU.vmin(10, 73, 1e5), linestyle=":", color='k')
+#for s in strlist:
+#s = strlist[4]
+for i in range(len(slist)):
+    s = strlist[i]
+    v, f = getVelDist(s, 10)
+    ax1.plot(v, f, linewidth=2.0, label=s)
+#ax1.plot(v1, fv2, linewidth=2.0, label=r'$\sigma_p = 10^{-29}$ cm$^2$')
+#ax1.plot(v1, fv3, linewidth=2.0, label=r'$\sigma_p = 10^{-28}$ cm$^2$')
+#ax1.axvline(DMU.vmin(10, 73, 1e5), linestyle=":", color='k')
 
 ax1.set_xlabel(r'$v$ [km/s]')
 ax1.set_ylabel(r'$f(v)$ [s/km]')
-ax1.set_ylim(0, 5e-3)
+ax1.set_yscale("log")
+#ax1.set_ylim(0, 5e-3)
 pl.legend(loc='best')
-pl.savefig('plots/SpeedDists.pdf', bbox_inches='tight')
+#pl.savefig('plots/SpeedDists.pdf', bbox_inches='tight')
 pl.show()
 
 

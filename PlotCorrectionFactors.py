@@ -98,12 +98,12 @@ pl.show()
 
 
 
-print " Calculating for Lead..."
+print " Calculating for Germanium..."
 sig_corr_Fe = v_vals*0.0
 ER_corr_Fe = v_vals*0.0
 for i, v in enumerate(v_vals):
-    sig_corr_Fe[i] = quad(lambda x: DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 207), 0, 1)[0]
-    ER_corr_Fe[i] = quad(lambda x: 2.0*x*DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*56, v), 207), 0, 1)[0]
+    sig_corr_Fe[i] = quad(lambda x: DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*73, v), 73), 0, 1)[0]
+    ER_corr_Fe[i] = quad(lambda x: 2.0*x*DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*73, v), 73), 0, 1)[0]
 
 print " Calculating for Oxygen..."
 sig_corr_O = v_vals*0.0
@@ -112,17 +112,20 @@ for i, v in enumerate(v_vals):
     sig_corr_O[i] = quad(lambda x: DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*16, v), 16), 0, 1)[0]
     ER_corr_O[i] = quad(lambda x: 2.0*x*DMU.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*16, v), 16), 0, 1)[0]
 
-f, ax2 = pl.subplots(1)
+f, axarr = pl.subplots(2)
 
+
+ax1 = axarr[0]
+ax2 = axarr[1]
 #Subplot 1 - cross section correction
-#ax1.plot(v_vals,sig_corr_O, color='blue',label='O', linewidth=1.5)
-#ax1.plot(v_vals,sig_corr_Fe, color='green', label='Fe', linewidth=1.5)
+ax1.plot(v_vals,sig_corr_O, color='blue',label='O', linewidth=1.5)
+ax1.plot(v_vals,sig_corr_Fe, color='green', label='Fe', linewidth=1.5)
 
 #ax1.plot(v_vals, 1-(v_vals/(800*2.3))**2, 'b--')
 
 
 #ax1.set_xticks([])
-#ax1.set_ylabel('Cross section correction')
+ax1.set_ylabel('Cross section correction')
 #ax1.set_ylim(0, 1.1)
 #ax1.axhline(1.0, color='k', linestyle=':')
 
@@ -143,4 +146,10 @@ ax2.legend(loc='best', frameon=False)
 
 #f.subplots_adjust(hspace=0.1)
 pl.savefig("test.pdf", bbox_inches="tight")
+
+n_Ge = (5.3/73.0)*6.02e23
+
+pl.figure()
+pl.plot(v_vals,1*n_Ge*1e6*1e-28*(73**4)*(73*0.9315)*(v_vals/3e5)**2*ER_corr_Fe[i])
+
 pl.show()

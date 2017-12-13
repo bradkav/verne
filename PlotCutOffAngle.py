@@ -37,22 +37,31 @@ verne.loadIsotopes()
 
 Nvals = 1001
 
+#depth = 0.3
 depth = 10.6
-#sigma_p = 1.575e-28
-sigma_p = 10**(-29)
+#sigma_p = 1.585e-28
+#sigma_p = 1e-27
+sigma_p = 10**(-27.801)
+#10**(-27.802) gives a v_max of 23.55
+#sigma_p = 10**(-29)
 m_x = 1e5
 
 verne.loadFFcorrections(m_x)
 
-gamma = 0.0
+gamma = np.pi*1.0
 vesc = 533.0
 v_e = np.sqrt(2)*156.0
 
+#tvals = 1-np.logspace(-5,-3, 100)
+#tvals = np.append(tvals,np.linspace(0, 1, Nvals-100))
+#tvals = np.sort(tvals)
 tvals = np.linspace(0, 1, Nvals)
+
+print tvals
 thetavals = np.pi*tvals
 
 
-target_all = "full"
+target_all = "SUF"
 
 v_th = 1.0
 #print verne.calcf_integ(220.0, 0, gamma), verne.calcf_integ(220.0, np.pi*0.5, gamma), verne.calcf_integ(220.0, np.pi, gamma)

@@ -15,23 +15,6 @@ import argparse
 import os.path
 
 
-#Matplotlib ------------
-
-import matplotlib as mpl
-font = { 'size'   : 16, 'family':'serif'}
-mpl.rcParams['xtick.major.size'] = 5
-mpl.rcParams['xtick.major.width'] = 1
-mpl.rcParams['xtick.minor.size'] = 3
-mpl.rcParams['xtick.minor.width'] = 1
-mpl.rcParams['ytick.major.size'] = 5
-mpl.rcParams['ytick.major.width'] = 1
-mpl.rcParams['ytick.minor.size'] = 3
-mpl.rcParams['ytick.minor.width'] = 1
-mpl.rc('font', **font)
-
-import matplotlib.pyplot as pl
-#------------------------
-
 #Parse the arguments!
 parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)

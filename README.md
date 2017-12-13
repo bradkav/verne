@@ -9,12 +9,11 @@ The code is compatible with Python2.7. Requires [numpy](http://www.numpy.org) an
 - Check all `BJK` in the code - these are comments to me...  
 - Check that the notation mx, mX, etc. is consistent  
 - Check out CRESST sapphire
+- For the HPC code, make sure to copy the parameters first maybe!!!
 
 ## General code structure
 
-`verne_analytic.py` is where most of the heavy-duty calculations take place.
-
-Import with `import verne_analytic as VA`.
+`verne.py` is where most of the heavy-duty calculations take place.
 
 ### Isotopes
 
@@ -32,6 +31,8 @@ The isotopes to be considered are identified by identifiers `isoID` from `0` to 
 | 7		  | Al		|
 | 8		  | O (Atmos.) |
 | 9	      | N (Atmos.) |
+
+In addition, we calculate the form factor corrections for Lead and Copper, as these are required in calculating the shielding effects.
 
 ### Coordinate systems
 

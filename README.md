@@ -10,7 +10,10 @@ The code allows you to calculate the speed distribution (and DM signal rate) at 
 
 The code will soon be updated with more detailed documentation and more examples. The core of the code (the `verne` module) is in the [src](src) folder, head there for some details of how to use the code. More information about the inner workings will appear soon.
 
-**Version 1.0 Release (13/12/2017):** Initial release.  
+### Version history
+
+**Version 1.0 (14/12/2017):** Initial release (including arXiv numbers, etc.)  
+**Version 0.9 (13/12/2017):** Pre-release before arXiv submission.  
 
 ### Contents
 
@@ -18,7 +21,8 @@ The code will soon be updated with more detailed documentation and more examples
 - `data`: A collection of data tables (Earth element density profiles, etc.) which are read in by `verne`. 
 - `results`: Numerical results for the final speed distributions, numbers of signal events and constraints.
 - `plotting`: Scripts for generating plots from the results.
-- `plots`: Plots and illustrations summarising the key results. Mostly from [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).
+- `plots`: Plots and illustrations summarising the key results. Mostly from [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).  
+- `paper`: PDF and tex files for the associated paper.
 
 ### Dependencies
 

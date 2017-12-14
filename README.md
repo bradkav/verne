@@ -16,7 +16,7 @@ The code will soon be updated with more detailed documentation and more examples
 - `data`: A collection of data tables (Earth element density profiles, etc.) which are read in by `verne`. 
 - `results`: Numerical results for the final speed distributions, numbers of signal events and constraints.
 - `plotting`: Scripts for generating plots from the results.
-- `plots`: Plots and illustrations summarising the key results. Mostly from [arXiv:XXXXX](https://arxiv.org/abs/XXXXX).
+- `plots`: Plots and illustrations summarising the key results. Mostly from [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).
 
 ### Dependencies
 

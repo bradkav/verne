@@ -108,10 +108,11 @@
   {Angloher} \emph {et~al.}}]{Angloher:2017sxg}%
   \BibitemOpen
   \bibfield  {author} {\bibinfo {author} {\bibfnamefont {G.}~\bibnamefont
-  {Angloher}} \emph {et~al.},\ }\href@noop {} {\  (\bibinfo {year} {2017})},\
-  \Eprint {http://arxiv.org/abs/1707.06749} {arXiv:1707.06749 [astro-ph.CO]}
-  \BibitemShut {NoStop}%
-%%CITATION = ARXIV:1707.06749;%%
+  {Angloher}} \emph {et~al.},\ }\href {\doibase 10.1140/epjc/s10052-017-5223-9}
+  {\bibfield  {journal} {\bibinfo  {journal} {The European Physical Journal C}\
+  }\textbf {\bibinfo {volume} {77}} (\bibinfo {year} {2017}),\
+  10.1140/epjc/s10052-017-5223-9},\ \Eprint {http://arxiv.org/abs/1707.06749}
+  {arXiv:1707.06749 [astro-ph.CO]} \BibitemShut {NoStop}%
 \bibitem [{\citenamefont {Essig}\ \emph {et~al.}(2017)\citenamefont {Essig},
   \citenamefont {Volansky},\ and\ \citenamefont {Yu}}]{Essig:2017kqs}%
   \BibitemOpen

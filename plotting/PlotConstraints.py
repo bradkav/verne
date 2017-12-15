@@ -71,8 +71,8 @@ ax1.set_xscale("log")
 
 
 ax1.fill_between(mvals, np.vectorize(calc_lower)(mvals), upper_old_interp(mvals), alpha=0.25, color='grey',edgecolor='black')
-ax1.fill_between(mvals2, upper_old_interp(mvals2), upper_new_interp(mvals2), alpha=0.25, color='DarkBlue',edgecolor='black')
-ax1.fill_between(mvals5, upper_old_interp(mvals5), 10**upper_new_nucleus_interp(np.log10(mvals5)), alpha=0.25, color='DarkRed',edgecolor='black')
+ax1.fill_between(mvals2, upper_old_interp(mvals2), upper_new_interp(mvals2), alpha=0.4, color='DarkBlue',edgecolor='black')
+ax1.fill_between(mvals5, upper_old_interp(mvals5), 10**upper_new_nucleus_interp(np.log10(mvals5)), alpha=0.4, color='DarkRed',edgecolor='black')
 ax1.set_ylim(1e-47, 1e-17)
 
 ax1.set_xlabel(r"DM mass $m_\chi \,\,[\mathrm{GeV}]$")
@@ -86,9 +86,9 @@ ax1.text(10, 1e-19, "High-altitude", color='DarkOrange',fontsize=txtfont)
 ax1.text(1e6, 1e-35, "Direct detection",fontsize=txtfont)
 ax1.text(1e4, 1e-45, "Xenon1T",fontsize=txtfont)
 ax1.text(1e0, 1e-38, "CRESST-III",fontsize=txtfont)
-ax1.text(5e-2, 1e-26, r"$\nu$-cleus",fontsize=txtfont)
+#ax1.text(5e-2, 1e-26, "CRESST 2017\nsurface",fontsize=txtfont)
 ax1.text(1e6, 1e-21, "CDMS-I (this work)", color='DarkBlue',fontsize=txtfont)
-ax1.text(0.8e2, 1e-24, r"$\nu$-cleus (this work)", color='DarkRed',fontsize=txtfont)
+ax1.text(0.5e1, 0.3e-25, "CRESST 2017 surface\n(this work)", color='Red',fontsize=txtfont)
 
 
 pl.savefig('../plots/Constraints1.pdf', bbox_inches='tight',fontsize=txtfont)

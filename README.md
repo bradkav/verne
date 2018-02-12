@@ -12,6 +12,7 @@ The code will soon be updated with more detailed documentation and more examples
 
 ### Version history
 
+**Version 1.1 (12/02/2018):** Updated event rate calculation to account for correct CRESST exposure times. Minor edits to text.  
 **Version 1.0 (14/12/2017):** Initial release (including arXiv numbers, etc.)  
 **Version 0.9 (13/12/2017):** Pre-release before arXiv submission.  
 

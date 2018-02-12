@@ -38,14 +38,21 @@ def rate_prefactor(A, m_x):
 lat_MPI = +48.1 #N
 lon_MPI = +11.57 #W
 
-#Get Julian date of exposure
-t0 = JulianDay(1, 1, 2017, 1)
-Nvals = 10001
 
-#Pick a typical day to integrate over
-#June 20th...
-t1 = 171.0
-t2 = 172.0
+
+
+#From https://arxiv.org/src/1707.06749v4/anc/additional_material.txt
+#Date and time of measurement:
+#Start: Tue Feb 16 2017, 23:14:06 UTC+1  
+#Stop: Wed Feb 17 2017, 04:33:17 UTC+1
+
+#Get Julian date of exposure
+#JulianDay(month, day, year, hour)
+t0 = JulianDay(2, 16, 2017, 22)
+t1 = 14.0/(60*24) #Start time is 14 minutes past 22hrs
+t2 = t1 + 5.31/24.0 #Total run time is 5.31 hours
+
+Nvals = 10001
 tvals = t0 + np.linspace(t1, t2, Nvals)
 
 gammavals = np.zeros(Nvals)
@@ -76,7 +83,7 @@ def calcEta_final(v, interpfun, vmax):
 #Calculate recoil spectrum
 def dRdE(E, A, mx,sig,interpfun,vmax):  
     int_factor = sig*verne.calcSIFormFactor(E, A)*A**2
-    return rate_prefactor(A, mx)*int_factor*calcEta_final(DMU.vmin(E, A, mx),  interpfun, vmax)
+    return rate_prefactor(A, mx)*int_factor*calcEta_final(MB.vmin(E, A, mx),  interpfun, vmax)
 
 #Calculate number of signal events
 def Nevents(E_min, E_max, m_x, sig, gamma_ind = 10):
@@ -103,7 +110,9 @@ for i in range(11):
 Ne_interp = interp1d(np.linspace(0, 1,11)*np.pi, Ne_list)
 
 #Integrate over the values of gamma for a single day
-Ne_tot =  simps(Ne_interp(gammavals), tvals-t0)
+#Note that the 5.31 hr exposure time is already included in the
+#exposure, so need to correct for that here...
+Ne_tot =  simps(Ne_interp(gammavals), tvals-t0)*(24.0/5.31)
 print "Total number of events:", Ne_tot
 
 #Append to number of events file

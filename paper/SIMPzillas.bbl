@@ -527,6 +527,14 @@
   {http://arxiv.org/abs/1211.1951} {arXiv:1211.1951 [astro-ph.CO]} \BibitemShut
   {NoStop}%
 %%CITATION = ARXIV:1211.1951;%%
+\bibitem [{\citenamefont {Kavanagh}(2017)}]{verne}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {B.~J.}\ \bibnamefont
+  {Kavanagh}},\ }\href@noop {} {\enquote {\bibinfo {title} {{verne v1.0}},}\
+  }\bibinfo {howpublished} {\textnormal{. Available at
+  }\url{https://github.com/bradkav/verne}, \textnormal{. Archived at }
+  \href{http://dx.doi.org/10.5281/zenodo.1115601}{\textnormal{doi:10.5281/zenodo.1115601}}}
+  (\bibinfo {year} {2017})\BibitemShut {NoStop}%
 \bibitem [{\citenamefont {Abusaidi}\ \emph {et~al.}(2000)\citenamefont
   {Abusaidi} \emph {et~al.}}]{Abusaidi:2000wg}%
   \BibitemOpen
@@ -548,14 +556,6 @@
   (\bibinfo {year} {2002})},\ \Eprint {http://arxiv.org/abs/astro-ph/0203500}
   {arXiv:astro-ph/0203500 [astro-ph]} \BibitemShut {NoStop}%
 %%CITATION = ASTRO-PH/0203500;%%
-\bibitem [{\citenamefont {Kavanagh}(2017)}]{verne}%
-  \BibitemOpen
-  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {B.~J.}\ \bibnamefont
-  {Kavanagh}},\ }\href@noop {} {\enquote {\bibinfo {title} {{verne v1.0}},}\
-  }\bibinfo {howpublished} {\textnormal{. Available at
-  }\url{https://github.com/bradkav/verne}, \textnormal{. Archived at }
-  \href{http://dx.doi.org/10.5281/zenodo.1115601}{\textnormal{doi:10.5281/zenodo.1115601}}}
-  (\bibinfo {year} {2017})\BibitemShut {NoStop}%
 \bibitem [{\citenamefont {Jungman}\ \emph {et~al.}(1996)\citenamefont
   {Jungman}, \citenamefont {Kamionkowski},\ and\ \citenamefont
   {Griest}}]{Jungman:1995df}%

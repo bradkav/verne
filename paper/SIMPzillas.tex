@@ -48,13 +48,9 @@
 
 
 \begin{abstract}
-Direct searches for Dark Matter (DM) are continuously improving, probing down to lower and lower DM-nucleon interaction cross sections. For strongly-interacting massive particle (SIMP) Dark Matter, however, the accessible cross section is bounded from above due to the stopping effect of the atmosphere, Earth and detector shielding. We present a careful calculation of the SIMP signal rate, focusing on super-heavy DM ($m_\chi \gtrsim 10^5 \,\,\mathrm{GeV}$), where the standard nuclear-stopping formalism is applicable. With recent results from the low-threshold CRESST 2017 surface run, we improve the maximum cross section reach of direct detection searches by a factor of around 5000, for DM masses up to $10^8 \,\,\mathrm{GeV}$. A reanalysis of the longer-exposure, sub-surface CDMS-I results (published in 2002) improves the previous cross section reach by two orders of magnitude, for masses up to $10^{15} \,\,\mathrm{GeV}$. Along with complementary constraints from SIMP capture and annihilation in the Earth and Sun, these improved limits from direct nuclear scattering searches close a number of windows in the SIMP parameter space in the mass range $10^6$ GeV to $10^{13}$ GeV, of particular interest for heavy DM produced gravitationally at the end of inflation.
-
-%Consistent with inflaton stuff?
+Direct searches for Dark Matter (DM) are continuously improving, probing down to lower and lower DM-nucleon interaction cross sections. For strongly-interacting massive particle (SIMP) Dark Matter, however, the accessible cross section is bounded from above due to the stopping effect of the atmosphere, Earth and detector shielding. We present a careful calculation of the SIMP signal rate, focusing on super-heavy DM ($m_\chi \gtrsim 10^5 \,\,\mathrm{GeV}$) for which the standard nuclear-stopping formalism is applicable, and provide code for implementing this calculation numerically. With recent results from the low-threshold CRESST 2017 surface run, we improve the maximum cross section reach of direct detection searches by a factor of around 5000, for DM masses up to $10^8 \,\,\mathrm{GeV}$. A reanalysis of the longer-exposure, sub-surface CDMS-I results (published in 2002) improves the previous cross section reach by two orders of magnitude, for masses up to $10^{15} \,\,\mathrm{GeV}$. Along with complementary constraints from SIMP capture and annihilation in the Earth and Sun, these improved limits from direct nuclear scattering searches close a number of windows in the SIMP parameter space in the mass range $10^6$ GeV to $10^{13}$ GeV, of particular interest for heavy DM produced gravitationally at the end of inflation.
  
 \end{abstract}
-
-%We calculate the expected SIMP signal rate using a nuclear-stopping formalism, assuming straight-line trajectories and accounting for the form factor suppression of the stopping cross section and the full 3-dimensional velocity distribution.
 
 \maketitle
 
@@ -66,13 +62,13 @@ Direct detection experiments aim to detect Dark Matter (DM) by measuring the ene
 
 There has been much recent interest in signals and constraints for DM which interacts strongly with nuclei and whose distribution may therefore be affected by scattering in the Earth \cite{Collar:1992qc,Collar:1993ss,Hasenbalg:1997hs}. Much of this has been focused on light (sub-GeV) DM where lower limits from conventional direct detection experiments weaken, meaning that moderate DM-nucleon scattering cross sections have not yet been excluded \cite{Foot:2011fh,Kouvaris:2014lpa,Kouvaris:2015laa,Foot:2014osa,Clarke:2015gqw,Bernabei:2015nia,Emken:2017erx,Davis:2017noy}. However, care must be taken in the treatment of DM scattering in the Earth. Light DM may be deflected substantially when it scatters with nuclei, drastically changing the incoming direction and path length \cite{Kavanagh:2016pyr,Mahdawi:2017cxz,Mahdawi:2017utm}. However, the recently developed \textsc{DaMaSCUS} Monte Carlo code \cite{Emken2017a} accounts for these effects and can be used to reliably predict signals of strongly-interacting light DM over a range of cross sections \cite{Emken:2017qmp}.
 
-Heavier DM, on the other hand, is already strongly constrained by direct detection experiments. But constraints typically cut off at large values of the DM-nucleon cross section, where scattering in the Earth slows the DM particles before they reach the detector \cite{Starkman:1990nj,Albuquerque:2003ei}, rendering them undetectable. At even larger cross sections, airborne experiments provide constraints, as the less dense atmosphere is not as effective at stopping DM particles \cite{Davis:2017noy}. A number of small windows remain open between these constraints for DM masses larger than $\sim10^5$ GeV, in the mass range favoured by gravitational production at the end of inflation \cite{Hui:1998dc,Allahverdi:2002nb,Kannike:2016jfs}. Though these regions are disfavoured by complementary constraints from considering DM capture and annihilation in the Earth and Sun \cite{Mack:2007xj,Albuquerque:2010bt,Mack:2012ju}, it is important to cross-check using direct searches, which rely on an entirely different set of assumptions. In this work, we demonstrate that the maximum cross section excluded by existing direct detection experiments can be increased by more than three orders of magnitude, excluding these remaining windows using nuclear scattering experiments alone.
+Heavier DM, on the other hand, is already strongly constrained by direct detection experiments. But constraints typically cut off at large values of the DM-nucleon cross section, where scattering in the Earth slows the DM particles before they reach the detector \cite{Starkman:1990nj,Albuquerque:2003ei}, rendering them undetectable. At even larger cross sections, airborne experiments provide constraints, as the less dense atmosphere is not as effective at stopping DM particles \cite{Davis:2017noy}. A number of small windows remain open between these constraints for DM masses larger than $\sim10^5$ GeV, in the mass range favoured by gravitational production at the end of inflation \cite{Hui:1998dc,Allahverdi:2002nb,Kannike:2016jfs}. Though these regions are disfavoured by complementary constraints from considering DM capture and annihilation in the Earth and Sun \cite{Mack:2007xj,Albuquerque:2010bt,Mack:2012ju}, it is important to cross-check using direct searches, which rely on an entirely different set of assumptions. In this work, we demonstrate that the maximum cross section excluded by existing direct detection experiments can be increased by more than three orders of magnitude, excluding these remaining windows using nuclear scattering experiments alone. We also provide a numerical code, \textsc{verne} \cite{verne}, which can be used to calculate the Earth-stopping effect for heavy DM and derive lower limits on the DM-nucleon cross section.
 
 We focus here on two experiments: the CRESST 2017 surface run \cite{Angloher:2017sxg}, operated at the Max-Planck-Institute for Physics (MPI) Munich in 2017, and CDMS-I \cite{Abusaidi:2000wg,Abrams:2002nb}, operated at the Stanford Underground Facility (SUF) in 1998-1999. The CRESST 2017 surface run provides excellent sensitivity to strongly interacting massive particles (SIMPs) because of its low threshold of 20 eV, as well as the fact that it was operated in a surface building, meaning that there is limited shielding by the Earth. We extend the SIMP limits presented in Ref.~\cite{Davis:2017noy} to large masses. However, the short  ($\sim$ few hours) exposure of the CRESST 2017 surface run means that it is not sensitive to DM masses larger than $\sim10^8$ GeV, when the number of DM particles crossing the detector over the course of the exposure becomes too small to generate an appreciable signal. Instead, the CDMS-I experiment had a longer ($\sim$ 1 year) exposure and therefore probes masses up to  $\sim10^{15}$ GeV. Limits on SIMPs from CDMS-I were derived in Ref.~\cite{Albuquerque:2003ei} and we present a refinement of those limits, taking into account form factor suppression of the SIMP scattering underground, as well as modelling the full (anisotropic) velocity distribution of incoming SIMPs.
 
 In Sec.~\ref{sec:DirectDetection}, we present the general framework of direct detection, then in Sec.~\ref{sec:NuclearStopping}, we describe the formalism for calculating the final DM velocity at the detector, after propagation through the atmosphere, Earth and detector shielding. We focus on heavy DM ($m_\chi \gtrsim 10^5 \,\,\mathrm{GeV}$) with large scattering cross sections, which allows us to make two simplifications. First, DM with a cross section $\sim 10^{-28}\,\,\mathrm{cm}^2$ would typically scatter $N_\mathrm{scat}\sim\mathcal{O}(4000)$ times before reaching the CDMS-I detector at SUF. Thus, we can approximate the energy losses as continuous over the path of the particles. In addition, for each scatter with a nucleus of mass $m_N$, the DM is deflected by an angle $\delta \theta \sim m_N/m_\chi \lesssim 10^{-3}$ \cite{Kavanagh:2016pyr}. The total deflection of the DM particle is then expected to be $\Delta \theta \sim \delta \theta/\sqrt{N_\mathrm{scat}} \lesssim \mathcal{O}(0.05)$. We can thus approximate the trajectories of DM particles as straight lines, allowing us to use the standard nuclear stopping formalism and avoiding the need for complicated Monte Carlo calculations.
 
-With this formalism in hand, we derive the final velocity distribution at the detectors in Sec.~\ref{sec:VelDist}, followed by the expected signal rate and resulting constraints in Sec.~\ref{sec:constraints}. The final constraints are shown in Fig.~\ref{fig:constraints}, for DM masses in the range $1$ GeV to $10^{15}$ GeV, with the caveat that at low masses these results need to be supplemented with dedicated Monte Carlo simulations. All code for performing the calculations in this paper, along with all results and plots, is made freely available online at \href{https://github.com/bradkav/verne}{https://github.com/bradkav/verne} \cite{verne}.
+With this formalism in hand, we derive the final velocity distribution at the detectors in Sec.~\ref{sec:VelDist}, followed by the expected signal rate and resulting constraints in Sec.~\ref{sec:constraints}. The final constraints are shown in Fig.~\ref{fig:constraints}, for DM masses in the range $1$ GeV to $10^{15}$ GeV, with the caveat that at low masses these results need to be supplemented with dedicated Monte Carlo simulations. All code for performing the calculations in this paper, along with all results and plots, is made freely available online, along with the numerical code \textsc{verne}, at \href{https://github.com/bradkav/verne}{https://github.com/bradkav/verne} \cite{verne}.
 
 
 \section{Direct detection of SIMPs}
@@ -108,7 +104,7 @@ Equation~\eqref{eq:veldist} corresponds to the initial velocity distribution of 
 \label{eq:gamma}
 \gamma = \cos^{-1}\left(\langle \hat{\mathbf{v}}_\chi\rangle \cdot \hat{\mathbf{r}}_\mathrm{det}\right)\,.
 \end{equation}
-With this definition, the mean DM flux appears to come from directly overhead for $\gamma = 180^\circ$ while the flux appears to come from below (through most of the Earth) for $\gamma = 0^\circ$. 
+With this definition, the mean DM flux appears to come from directly overhead for $\gamma = 180^\circ$ while the flux appears to come from below (through most of the Earth) for $\gamma = 0^\circ$. Explicit expressions for the velocity distribution in terms of the angle $\gamma$ are given in Appendix~\ref{app:coordinates}.
 
 In Fig.~\ref{fig:gamma}, we plot the value of $\gamma$ for the Stanford Underground Facility (SUF, latitude $37.4^\circ \mathrm{N}$, longitude $122.2^\circ \mathrm{W}$) for a 1-year period covering the CDMS-I exposure presented in Ref.~\cite{Abusaidi:2000wg,Abrams:2002nb}. The slow variation due to the Earth's orbit and the fast oscillations from the Earth's rotation are both visible. On average, the flux of DM appears to come from above, at an angle $\sim 53^\circ$ off the vertical. This suggests that the typical path length for DM particles arriving at SUF will be relatively short, as the particles do not need to cross the entire Earth to reach the detector. The picture is similar for the Max Planck Institute in Munich (MPI, latitude $48.1^\circ \mathrm{N}$, longitude $11.57^\circ \mathrm{E}$), owing to the similar Northern latitude.
 % However, we note that the $nu$-cleus exposure is much shorter (a few hours) and 
@@ -126,12 +122,12 @@ The variation of $\gamma$ during the exposure means that DM particles will trave
 \dbd{N_e}{t} = M \int_{E_\mathrm{min}}^{E_\mathrm{max}} \dbd{R(t)}{E_R} \epsilon(E_R) \,\mathrm{d}E_R\,,
 \end{split}
 \end{align}
-where $M$ is the fiducial mass of the experiment, $\epsilon(E_R)$ is the nuclear recoil detection efficiency\footnote{Here, we assume that any energy resolution effects have been folded into the efficiency function.} and the analysis window of the experiment is $E_R \in [E_\mathrm{min}, E_\mathrm{max}]$. Though we do not know the exact times of the exposures of the two experiments, we can estimate the effect of the time variation by integrating the event rate over the course of a typical day, then multiplying by the total number of exposure days:
+where $M$ is the fiducial mass of the experiment, $\epsilon(E_R)$ is the nuclear recoil detection efficiency\footnote{Here, we assume that any energy resolution effects have been folded into the efficiency function.} and the analysis window of the experiment is $E_R \in [E_\mathrm{min}, E_\mathrm{max}]$. In the case of the CRESST 2017 surface run, we calculate the expected number of signal events by integrating over the full 5.31 hour exposure on the night of 16th February 2017 (see the ancillary material to Ref.~\cite{Angloher:2017sxg} for more details). For CDMS-I, we do not know the exact times of the exposure, so we integrate the event rate over the course of a typical day, then multiply by the total number of exposure days:
 \begin{equation}
 \label{eq:Nexp}
 N_e = N_\mathrm{days} \int_{\mathrm{1\,\,day}} \left.\dbd{N_e}{t}\right|_{ \gamma(t)} \,\mathrm{d}t\,.
 \end{equation}
-For CDMS-I, we select this typical day as 21st April 1999 (somewhere mid-way through the full exposure). For the CRESST 2017 surface run, we select this typical day as 20th June 2017, though we note that the CRESST 2017 exposure was shorter than 1 day so the true limits in this case may be stronger or weaker depending on the precise timing of the exposure.
+We select this typical day as 21st April 1999 (somewhere mid-way through the full exposure). 
 
 While $\gamma = 180^\circ$ leads to the shortest path length for incident DM particles and therefore the largest rate, the detectors will generally not spend a long time oriented such that $\gamma = 180^\circ$. It is therefore important to calculate the speed distributions for a range of values of $\gamma$ and take all of these into account. In the next two sections, we explain how to calculate the DM velocity at the detector for a given trajectory, followed by the procedure for evaluating the speed distribution at the detector, accounting for all possible trajectories.
 
@@ -184,6 +180,7 @@ Because of the non-trivial dependence of the coherence factor $C_i(m_\chi, v)$ o
 \item Earth - particles then propagate in a straight line from the surface of the Earth to the detector. We include 8 different Earth elements - O, Si, Mg, Fe, Ca, Na, S, Al - using density profiles tabulated in Ref.~\cite{Lundberg:2004dn} (based on data from Refs.~\cite{Geochemistry,Britannica}).
 \item Shielding - finally, the particles propagate through any shielding which surrounds the detector. In the case of the atmosphere and the Earth, the path length depends on the angle of incidence, while for the shielding we assume a constant path length, regardless of incoming direction. 
 \end{itemize}
+Explicit expressions for the path length through the atmosphere and Earth are given in Appendix~\ref{app:coordinates}.
 
 For the CDMS-I detector as SUF, we assume that the detector is located 10.6m underground and is surrounded by 16cm of lead shielding\footnote{Polyethylene and copper shields are also employed, but we neglect these owing to lead's much larger scattering cross section with DM particles.}. For the CRESST 2017 surface run at MPI, the only substantial shielding comes from the walls of the surface building itself, consisting of 30cm of concrete. We model this by assuming that the detector is positioned at a depth of 30 cm underground. In addition, we include shielding from 1mm of copper surrounding the detector.
 
@@ -284,7 +281,7 @@ For CDMS-I, we consider an analysis window for nuclear recoil energies of $E_R \
 
 %For a total exposure of $MT = 15.8\,\,\mathrm{kg}\,\, \mathrm{days}$), we predict $\mathcal{O}(60000)$ signal events for a DM mass of $10^5 \,\,\mathrm{GeV}$ and scattering cross section of $\sigma_p^\mathrm{SI} = 1.55 \times 10^{-28}\,\,\mathrm{cm}^2$. For the slightly larger cross section of $\sigma_p^\mathrm{SI} = 1.58 \times 10^{-28}\,\,\mathrm{cm}^2$, we predict zero signal events, highlighting the very strong dependence of the final speed distribution on the DM-nucleon cross section. This indicates that a detailed statistical treatment of the CDMS-I data is not required: if DM particles have sufficient energy to excite recoils above the experimental threshold then the number of events will far exceed the $\mathcal{O}(20)$ events consistent with single-scatter nuclear recoils in the CDMS-I dataset. We conservatively take  $\sigma_p^\mathrm{SI} = 1.55 \times 10^{-28}\,\,\mathrm{cm}^2$ as the 90\% confidence-level lower limit on the cross section at $10^5 \,\,\mathrm{GeV}$, noting that this limit is accurate at the level of a few percent. We use a similar procedure for other values of the DM mass.
 
-For the CRESST 2017 surface run, using an $\mathrm{Al}_2\mathrm{O}_3$ target, we assume a total exposure of $4.6 \times 10^{-5}\,\,\mathrm{kg} \,\mathrm{days}$, an energy window of $E_R \in [19.7, \, 600] \,\mathrm{eV}$ and a Gaussian energy resolution of 3.74 eV at threshold. In this exposure, 511 events were observed in the region of interest. Because of the exponential cut off of the speed distribution in this case (see the left panel of Fig.~\ref{fig:SpeedDists_xsec}), the number of signal events varies more slowly with cross section. For a DM mass of $10^5 \,\,\mathrm{GeV}$, we limit the cross section to be larger than $\sigma_p^\mathrm{SI} = 4.9 \times 10^{-27}\,\,\mathrm{cm}^2$. As for CDMS-I, the limit for larger masses can be obtained by simply rescaling this cross section by a factor $m_\chi/(10^5\,\,\mathrm{GeV})$.
+For the CRESST 2017 surface run, using an $\mathrm{Al}_2\mathrm{O}_3$ target, we assume a total exposure of $4.6 \times 10^{-5}\,\,\mathrm{kg} \,\mathrm{days}$, an energy window of $E_R \in [19.7, \, 600] \,\mathrm{eV}$ and a Gaussian energy resolution of 3.74 eV at threshold. In this exposure, 511 events were observed in the region of interest. Because of the exponential cut off of the speed distribution in this case (see the left panel of Fig.~\ref{fig:SpeedDists_xsec}), the number of signal events varies more slowly with cross section. For a DM mass of $10^5 \,\,\mathrm{GeV}$, we limit the cross section to be larger than $\sigma_p^\mathrm{SI} = 4.5 \times 10^{-27}\,\,\mathrm{cm}^2$. As for CDMS-I, the limit for larger masses can be obtained by simply rescaling this cross section by a factor $m_\chi/(10^5\,\,\mathrm{GeV})$.
 
 
 \begin{figure}[t]
@@ -306,7 +303,7 @@ The second contribution comes from considering the full (lab-frame anisotropic) 
 
 How robust are these constraints? Here we have assumed that the free, asymptotic velocity distribution matches the Standard Halo Model, which is typically assumed for WIMP Dark Matter. Of course, strong interactions could alter this distribution (see e.g.~Ref.~\cite{Fan:2013yva}) before the particles ever reach the Earth. In addition, there are also uncertainties on the WIMP velocity distribution from N-body simulations \cite{Bozorgnia:2017brl}. We could of course study specific velocity distributions using the methods presented here, but unless these lead to a substantial change in the maximum velocity of SIMPs arriving at Earth, we do not expect the limits to change by a large amount.
 
-As we argued in the introduction, the  angular deflection of DM particles (per scatter) is $\delta \theta \sim m_N/m_\chi$. As we move to larger DM masses and cross sections, the deflection per scatter decreases while the number of scatterings increases. This means that more and more DM particles will follow trajectories close to straight lines and the average energy loss (Eq.~\eqref{eq:energyloss}) will become an increasingly accurate description of the entire population of particles. Of course, DM particles which undergo fewer scatters than the average will typically arrive at the detector with a larger speed, meaning that there could still be a (highly suppressed) high speed tail of particles not captured by our description. Refs.~ \cite{Mahdawi:2017cxz,Mahdawi:2017utm} suggest an importance sampling method to capture these effects, though the relevant code has not yet been released. In any case, given the large number of scattering events we consider here, along with the rapid change in the CDMS-I event rate with cross section, we do not expect this high speed tail to significantly alter our results.
+As we argued in the introduction, the  angular deflection of DM particles (per scatter) is $\delta \theta \sim m_N/m_\chi$. As we move to larger DM masses and cross sections, the deflection per scatter decreases while the number of scatterings increases. This means that more and more DM particles will follow trajectories close to straight lines and the average energy loss (Eq.~\eqref{eq:energyloss}) will become an increasingly accurate description of the entire population of particles. Of course, DM particles which undergo fewer scatters than the average will typically arrive at the detector with a larger speed, meaning that there could still be a (highly suppressed) high speed tail of particles not captured by our description. Refs.~\cite{Mahdawi:2017cxz,Mahdawi:2017utm} suggest an importance sampling method to capture these effects, though the relevant code has not yet been released. In any case, given the large number of scattering events we consider here, along with the rapid change in the CDMS-I event rate with cross section, we do not expect this high speed tail to significantly alter our results.
 
 \section{Conclusions}
 
@@ -333,6 +330,70 @@ These updated constraints close a number of windows in the parameter space in th
 The author thanks Laura Baudis, Jonathan Davis and Timon Emken for helpful discussions and comments on an early version of this paper. The author also thanks Ciaran O'Hare for providing useful code for calculating the lab velocity as a function of time. The author gratefully acknowledges support from the Netherlands Organisation for Scientific Research (NWO) and from the European Research Council ({\sc Erc}) under the EU Seventh Framework Programme (FP7/2007-2013)/{\sc Erc} Starting Grant (agreement n.\ 278234 --- `{\sc NewDark}' project).
 This research was also supported by the Munich Institute for Astro- and Particle Physics (MIAPP) of the DFG cluster of excellence ``Origin and Structure of the Universe".
 Part of this work was carried out on the Dutch national e-infrastructure with the support of SURF Cooperative.
+
+\appendix
+
+\section{Coordinate system}
+\label{app:coordinates}
+Here, we give explicit expressions for the DM path length and velocity distribution in terms of the angular coordinates specifying the DM trajectory and the detector position (with respect to the mean DM flux direction). This coordinate system is illustrated in Fig.~\ref{fig:earth}. We denote the detector position as $\mathbf{r}_\mathrm{det}$ (as measured from the centre of the Earth) and we assume that the detector is at a vertical depth $d$ from the surface of the Earth. We denote the Earth radius as $R_E \approx 6371\,\mathrm{km}$ and the vertical height of the atmosphere as $h_A \approx 80 \,\mathrm{km}$. With these definitions, we have $|\mathbf{r}_\mathrm{det}| = r_\mathrm{det}= R_E - d$. 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.30\textwidth,]{plots/Earth.pdf}
+\caption{\textbf{Coordinate system for Earth scattering.} Illustration of the coordinate system used to calculate the impact of DM scattering in the Earth. The incoming direction of a single DM particle towards the detector is denoted by $\mathbf{v}$, while the direction of the mean DM flux is denoted $\langle \mathbf{v}_\chi\rangle = -\mathbf{v}_\mathrm{lab}(t)$. In the associated text, we give expressions for the DM path length to the detector and the velocity distribution in this coordinate system.}
+\label{fig:earth}
+\end{figure}
+
+We assume that a specific DM particle arrives at the detector in direction $\hat{\mathbf{v}}$, which makes an angle $\theta$ with the vertical.\footnote{Note that $\theta = 0$ corresponds to an \textit{upward}-going DM particle.} The straight-line path length $\ell$ from the top of the atmosphere to the detector for such a particle is given by:
+\begin{equation}
+\ell = r_\mathrm{det} \cos\theta + \sqrt{(R_E + h_A)^2 - (r_\mathrm{det} \sin\theta)^2 }\,.
+\end{equation}
+
+In order to correctly compute the scattering rate for DM particles, we must account for the radial dependence of the nuclear density in the Earth and atmosphere. For a DM particle which has travelled a distance $D$ along its trajectory, as measured from the top of the atmosphere, the radial distance from the Earth's centre is:
+\begin{equation}
+r = \sqrt{(R_E + h_A)^2 + D^2 + 2D(r_\mathrm{det}\cos\theta - \ell)}\,.
+\end{equation}
+With this, we can calculate the final speed $v_f$ from the initial speed $v_i$ (at the top of the atmosphere), along a given trajectory, using
+\begin{equation}
+\label{eq:vf}
+v_f = v_i + \int_0^{\ell} \frac{\mathrm{d}v}{\mathrm{d}D}(v, r) \,\mathrm{d}D\,.
+\end{equation}
+We emphasise that  $\mathrm{d}v/\mathrm{d}D$ (given explicitly in Eq.~\eqref{eq:stopping}) depends on both $r$ and $v$ and so Eq.~\eqref{eq:vf} must be solved numerically using an ODE solver.
+
+The DM velocity distribution is given in vectorial form in Eq.~\eqref{eq:veldist}. Here, we rewrite this in terms of angular coordinates. We describe the incoming DM direction using $\theta$, the polar angle measured from the downward vertical at the detector, and $\phi$, the azimuthal angle (which is suppressed in Fig.~\ref{fig:earth}). With these definitions, we can write:
+\begin{equation}
+|\mathbf{v} - \langle \mathbf{v}_\chi\rangle|^2 = v^2 - 2vv_\mathrm{lab} \cos\delta + v_\mathrm{lab}^2\,,
+\end{equation}
+where 
+\begin{equation}
+\cos\delta = \sin\gamma \sin\theta \cos\phi + \cos\gamma \cos\theta\,.
+\end{equation}
+In calculating the velocity distribution, we fix the magnitude of $v_\mathrm{lab} = 220 \,\mathrm{km/s}$, with the time dependence arising through the angle $\gamma = \gamma(t)$:
+\begin{equation}
+\gamma = \cos^{-1}\left(\langle \hat{\mathbf{v}}_\chi\rangle \cdot \hat{\mathbf{r}}_\mathrm{det}\right)\,.
+\end{equation}
+
+We finally note that path length of the DM does not depend on the azimuthal angle $\phi$, meaning that the final velocity at the detector depends only on the initial velocity and the polar angle, $v_f = v_f(v_i, \cos\theta)$. This means that in evaluating the final speed distribution at the detector (see Sec.~\ref{sec:VelDist}),
+\begin{align}
+\begin{split}
+\tilde{f}(v_f,\gamma) = \oint f(\mathbf{v}_i,\gamma) \,v_i^2 \dbd{v_i}{v_f} \, \mathrm{d}^2\hat{\mathbf{v}}\,,
+\end{split}
+\end{align}
+the two angular integrations can be performed separately. In terms of the angular coordinates, the final speed distribution is then,
+\begin{align}
+\begin{split}
+\label{eq:fvf}
+\tilde{f}(v_f,\gamma) = \int_{-1}^{1} f(v_i, \cos\theta, \gamma)\, v_i^2 \dbd{v_i}{v_f} \,\mathrm{d}\cos\theta\,,
+\end{split}
+\end{align}
+where we define
+\begin{align}
+\begin{split}
+\label{eq:fcostheta}
+f(v_i, \cos\theta, \gamma) = \int_{0}^{2\pi} f(v_i, \cos\theta,\phi,\gamma)\,\mathrm{d}\phi\,.
+\end{split}
+\end{align}
+The values of $f(v_i, \cos\theta, \gamma)$ are easily tabulated as a function of $v_i$ and $\cos\theta \cos\gamma$, meaning that only a single integration over $\theta$ is required (at a given value of $v_f$ and $\gamma$) in order to evaluate the final velocity distribution (Eq.~\refeq{eq:fvf}).
 
 \bibliography{WIMPzillas.bib}
 

@@ -33,7 +33,7 @@ The code is compatible with Python2.7. Requires [numpy](http://www.numpy.org) an
 
 If you make use of the code or the numerical results, please cite:
 
->Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:XXXX.XXXX
+>Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:1802.005
 
 as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1712.04901):
 

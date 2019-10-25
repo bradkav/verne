@@ -23,6 +23,10 @@ import MaxwellBoltzmann as MB
 #Distances in m
 #--------------------
 
+print "*********************************************"
+print "WARNING: SOME v^-4 FACTORS HAVE BEEN ADDED..."
+print "*********************************************"
+
 isotopes = None
 dens_profiles = None
 dens_interp = None
@@ -34,6 +38,15 @@ phi_interp = None
 corr_interp = None
 corr_Pb = None
 corr_Cu = None
+
+NEGLECT_FF = False
+
+if (NEGLECT_FF):
+    print " "
+    print "*********************************************"
+    print "WARNING: NEGLECTING FORM FACTORS..."
+    print "*********************************************"
+    
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
@@ -200,17 +213,21 @@ def calcFFcorrection(m_x, A0):
     for i, v in enumerate(v_vals):
         corr_fact[i] = quad(lambda x: 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0), 0, 1)[0]
     corr_fact[0] = 1.0
-    return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
+
+    if (NEGLECT_FF):
+        return interp1d(v_vals, 1.0+0.0*corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
+    else:
+        return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
 
 
 #Calculate the DM-nucleus 'effective' cross section
 #which takes into account the average energy loss
-def effectiveXS(sigma_p, m_X, A):
+def effectiveXS(sigma_p, m_X, A, v = 1.0):
     m_p = 0.9315 #Proton mass
     m_A = 0.9315*A
     mu_A = m_A*m_X/(m_A + m_X)
     mu_p = m_p*m_X/(m_p + m_X)
-    
+    #(v**-4)
     return sigma_p*(1.0/(m_X*m_A))*(A**2)*(mu_A**4/mu_p**2)
     
 
@@ -274,9 +291,10 @@ def dv_by_dD(v, D, params):
     
     r = radius(D, theta, depth)
 
-    #Loop over the relevant isotops
+    #Loop over the relevant isotopes
+    #BJK!
     for i in isovals:
-        res += dens_interp[i](r)*effectiveXS(sigma_p, m_x, Avals[i])*corr_interp[i](v)
+        res += dens_interp[i](r)*effectiveXS(sigma_p, m_x, Avals[i],v=v)*corr_interp[i](v)
     return -1e2*v*res #(km/s)/m
 
 #Derivative for the case of Pb shielding
@@ -286,7 +304,7 @@ def dv_by_dD_Pb(v, D, params):
     A_Pb = 207
         
     sigma_p, m_x = params
-    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb)*corr_Pb(v)
+    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb, v=v)*corr_Pb(v)
     return -1e2*v*res #(km/s)/m
 
 #Derivative for the case of Cu shielding
@@ -296,7 +314,7 @@ def dv_by_dD_Cu(v, D, params):
     A_Cu = 63.5
         
     sigma_p, m_x = params
-    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu)*corr_Cu(v)
+    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu,v=v)*corr_Cu(v)
     return -1e2*v*res #(km/s)/m
 
 #Calculate the final velocity after propagating across 'target'
@@ -323,14 +341,16 @@ def calcVfinal(vi, theta,  depth, sigma_p, m_x, target="full"):
 #Recommend using target="MPI" or "SUF" depending on the detector
 def calcVfinal_full(vi, theta,  depth, sigma_p, m_x, target="full"):
     vf = 1.0*vi
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="atmos")
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI"]):
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="earth") 
     if (target == "MPI"):
         vf = calcVfinal_shield_MPI(vf, sigma_p, m_x)
     if (target == "SUF"):
         vf = calcVfinal_shield_SUF(vf, sigma_p, m_x)
+    if (target == "EDE"):
+        vf = calcVfinal_shield_EDE(vf, sigma_p, m_x)
     return vf
     
 #Calculate the initial velocity (for a given final velocity) after propagating across 'target'
@@ -360,9 +380,11 @@ def calcVinitial_full(vf, theta,  depth, sigma_p, m_x, target="full"):
         vi = calcVinitial_shield_MPI(vi, sigma_p, m_x)
     if (target == "SUF"):
         vi = calcVinitial_shield_SUF(vi, sigma_p, m_x)
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI"]):
+    if (target == "EDE"):
+        vi = calcVinitial_shield_EDE(vi, sigma_p, m_x)
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="earth")
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="atmos")
 
     return vi
@@ -391,6 +413,19 @@ def calcVinitial_shield_MPI(v0, sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 1mm Copper
     psoln = odeint(dv_by_dD_Cu, v0, [1e-3,0] , args=(params,), mxstep=1000, rtol=1e-6)
+    return psoln[1]
+
+#Calculate final (or initial) speed after crossing the Lead shielding at EDE...
+def calcVfinal_shield_EDE(v0, sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 16cm of Lead
+    psoln = odeint(dv_by_dD_Pb, v0, [0,10.0e-2] , args=(params,), mxstep=1000, rtol=1e-6)
+    return psoln[1]
+    
+def calcVinitial_shield_EDE(v0,  sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 16cm of Lead (backwards)
+    psoln = odeint(dv_by_dD_Pb, v0, [10.0e-2,0] , args=(params,), mxstep=1000, rtol=1e-6)
     return psoln[1]
 
     

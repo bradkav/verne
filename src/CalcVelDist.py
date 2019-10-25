@@ -5,6 +5,8 @@ import MaxwellBoltzmann as MB
 import argparse
 
 
+results_dir = "../results/"
+
 #Parse the arguments!
 parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
@@ -19,6 +21,8 @@ if (loc == "SUF"):
     depth = 10.6 #metres
 elif (loc == "MPI"):
     depth = 0.3 #metres
+elif (loc == "EDE"):
+    depth = 1.0 #metres
 
 target = loc
 
@@ -85,7 +89,7 @@ def getVelDist(gamma):
     
     
 #Loop over gamma values
-N_gamma = 11
+N_gamma = 3
 Nv = 61
 gamma_list = np.linspace(0, 1.0, N_gamma)
 vgrid = np.zeros((N_gamma, Nv))
@@ -97,7 +101,7 @@ for j in range(N_gamma):
 gamma_rep = np.repeat(gamma_list, Nv)
 
 #Output to file
-fname = "../results/veldists/f_" + loc + "_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
+fname = results_dir + "veldists/f_" + loc + "_lmx" + '{0:.1f}'.format(np.log10(m_x)) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
 headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\nloc: " + target
 headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
 

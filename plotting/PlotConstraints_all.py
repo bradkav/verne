@@ -65,7 +65,7 @@ def calc_lower(m):
 pl.figure()
 ax1 = pl.gca()
 
-ax1.fill(DD_data[:,0], DD_data[:,1], facecolor='Grey', alpha=0.5, linestyle='-', edgecolor='k')
+ax1.fill(DD_data[:,0], DD_data[:,1], facecolor='Grey', alpha=0.5, linestyle='-', edgecolor='k',linewidth=2.0, zorder=0)
 ax1.fill(alt_data[:,0], alt_data[:,1], facecolor='Orange', alpha=0.25)
 ax1.add_patch(mpl.patches.Polygon(alt_data, facecolor='None', edgecolor='k', linestyle='--'))
 ax1.fill(IC_data[:,0], IC_data[:,1], facecolor='Red', alpha=0.25)

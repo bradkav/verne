@@ -38,17 +38,25 @@ verne.loadFFcorrections(m_x)
 v_initial = np.linspace(0, 800, Nvals)
 v_final_atmos = 0.0*v_initial
 v_final_lab = 0.0*v_initial
+v_final_lab2 = 0.0*v_initial
+v_final_lab3 = 0.0*v_initial
 v_final_full = 0.0*v_initial
 
 for i, v in enumerate(v_initial):
     v_final_atmos[i] = verne.calcVfinal(v, theta,  depth, sigma_p, m_x, target="atmos")
     v_final_lab[i] = verne.calcVfinal(v_final_atmos[i], theta,  depth, sigma_p, m_x, target="earth")
+    v_final_lab2[i] = verne.calcVfinal(v_final_atmos[i], theta,  depth*1.04, sigma_p, m_x, target="earth")
+    v_final_lab3[i] = verne.calcVfinal(v_final_atmos[i], theta,  depth*0.96, sigma_p, m_x, target="earth")
     v_final_full[i] = verne.calcVfinal_shield_SUF(v_final_lab[i], sigma_p, m_x)
     
+    
+print v_final_lab2/v_final_lab
+print v_final_lab3/v_final_lab
 
 pl.figure()
 pl.plot(v_initial, v_final_atmos,color='DarkBlue', linewidth=1.5, label='Atmos')
 pl.plot(v_initial, v_final_lab,color='DarkOliveGreen', linewidth=1.5,label=' + Earth')
+pl.fill_between(v_initial, v_final_lab2,v_final_lab3,color='DarkOliveGreen', linewidth=1.0, alpha=0.5, zorder=0)
 pl.plot(v_initial, v_final_full+2.0,color='DarkGoldenRod', linewidth=1.5, label=' + Shielding') #Add 2.0 so that it can be seen easily...
 pl.plot([0, 800], [0, 800], 'k--')
 

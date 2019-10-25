@@ -33,8 +33,16 @@ The code is compatible with Python2.7. Requires [numpy](http://www.numpy.org) an
 
 If you make use of the code or the numerical results, please cite:
 
->Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:1802.005
+>Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:1802.005, available at https://github.com/bradkav/verne.
 
 as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1712.04901):
 
 >Kavanagh, B. J. (2017), "Earth-Scattering of super-heavy Dark Matter: updated constraints from detectors old and new", arXiv:1712.04901.
+
+### Papers
+
+The `verne` code has been used (in some form or another) in the follow research papers:
+
+- *Earth-Scattering of super-heavy Dark Matter: updated constraints from detectors old and new*, B. J. Kavanagh (2017), [arXiv:1712.04901](https://arxiv.org/abs/1712.04901)  
+- *Searching for low-mass dark matter particles with a massive Ge bolometer operated above-ground*, EDELWEISS Collaboration & B. J. Kavanagh (2019), [arXiv:1901.03588](https://arxiv.org/abs/1901.03588)  
+- *A Search for Light Dark Matter Interactions Enhanced by the Migdal effect or Bremsstrahlung in XENON1T*, Xenon1T Collaboration (2019), [arXiv:1907.12771](https://arxiv.org/abs/1907.12771)

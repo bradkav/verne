@@ -9,6 +9,7 @@ phi_interp = None
 #------- Velocity distribution stuff----------
 #----------------------------------------------
 
+
 vesc = 533.0
 sigmav=156.0
 
@@ -23,7 +24,8 @@ NNORM = Nesc*156.0**3*np.sqrt(2.0*np.pi)*2.0*np.pi
 #*This is called as soon as the module is loaded*
 def loadPhiInterp():
     global phi_interp
-    fname = "../data/PhiIntegrals.dat"
+    curr_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
+    fname = curr_dir + "../data/PhiIntegrals.dat"
     xvals = np.arange(-7, 7.001, 0.05)
     phivals = np.arange(0, np.pi+0.1, 0.05)
     xlen = len(xvals)
@@ -34,8 +36,8 @@ def loadPhiInterp():
         z = data.reshape((xlen,ylen))
 
     else:
-        print "    File '../data/PhiIntegrals.dat' doesn't exist..."
-        print "    Calculating from scratch..."
+        print(">MAXWELLBOLTZMANN: File '../data/PhiIntegrals.dat' doesn't exist...")
+        print(">MAXWELLBOLTZMANN: Calculating from scratch...")
         z = np.zeros((xlen, ylen))
         for i,x in enumerate(xvals):
             for j,phi in enumerate(phivals):

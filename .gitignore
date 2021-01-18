@@ -2,6 +2,7 @@ backup/*
 .ipynb_checkpoints/*
 outputs/*
 *pyc
+.DS_store
 SubmitVerne.sh.o*
 SubmitVerne.sh.e*
 \#*\#

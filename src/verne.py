@@ -23,38 +23,40 @@ import MaxwellBoltzmann as MB
 #Distances in m
 #--------------------
 
-print "*********************************************"
-print "WARNING: SOME v^-4 FACTORS HAVE BEEN ADDED..."
-print "*********************************************"
-
 isotopes = None
 dens_profiles = None
 dens_interp = None
 Avals = None
 Niso = None
 Niso_full = None
+r_list = None
 
 phi_interp = None
 corr_interp = None
 corr_Pb = None
 corr_Cu = None
+corr_Fe = None
 
-NEGLECT_FF = False
-
-if (NEGLECT_FF):
-    print " "
-    print "*********************************************"
-    print "WARNING: NEGLECTING FORM FACTORS..."
-    print "*********************************************"
-    
+NEGLECT_FF = True
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
 h_A = 80e3  #Height of atmosphere in (m)
 R_E = 6371.0e3  #Earth Radius in (m)
 
+
+#--------------------
+#Integration parameters
+
+TOL = 1e-4
+NSTEP = 100
+
+
+#--------------------
+
+
 def loadIsotopes():
-    print "    Loading isotope data and density profiles..."
+    print(">VERNE: Loading isotope data and density profiles...")
     
     global dens_profiles
     global isotopes
@@ -62,8 +64,10 @@ def loadIsotopes():
     global dens_interp
     global Niso
     global Niso_full
+    global r_list
     
-    rootdir = "../data/"
+    rootdir = "data/"
+    #rootdir = "../data/"
     
     #Load in Earth isotopes
     Avals = np.loadtxt(rootdir+"isotopes.txt", usecols=(1,)) 
@@ -106,26 +110,32 @@ def loadIsotopes():
     dens_vec = np.vectorize(dens)
     dens_atmos = [np.append(r_list0, 2*f_n*dens_vec(h_list)) for f_n in frac]
     dens_profiles.extend(dens_atmos)
-    
     #Generate interpolation functions for the density profiles
-    dens_interp = [interp1d(r_list, dens, bounds_error=False, fill_value = 0) for dens in dens_profiles]
+    #dens_interp = [interp1d(r_list, dens, bounds_error=False, fill_value = 0) for dens in dens_profiles]
+    
+def dens_interp(index, r):
+    return np.interp(r, r_list, dens_profiles[index], left=0, right=0)
+    
     
 #Generate interpolation functions for the Form Factor corrections (C_i(v))
 def loadFFcorrections(m_x):
     global corr_interp
     global corr_Pb
     global corr_Cu
-    
+    global corr_Fe
+
+   
     #Check that the isotope list has been loaded
     if (Avals is None):
         loadIsotopes()
     
-    print "    Calculating Form Factor corrections for m_x = ", m_x, " GeV..."
+    print(">VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV...")
     corr_interp = [calcFFcorrection(m_x, Avals[ID]) for ID in range(Niso_full)]
     #Also need Lead + Copper, for the shielding
     corr_Pb = calcFFcorrection(m_x, 207) 
     corr_Cu = calcFFcorrection(m_x, 63.5)
-    
+    corr_Fe = calcFFcorrection(m_x, 55.8)
+
 #International standard atmosphere, ISO 2533:1975
 #https://www.iso.org/standard/7472.html
 def atmos_density(h, Hvals, Tvals, beta):
@@ -215,7 +225,8 @@ def calcFFcorrection(m_x, A0):
     corr_fact[0] = 1.0
 
     if (NEGLECT_FF):
-        return interp1d(v_vals, 1.0+0.0*corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
+        #return interp1d(v_vals, 1.0+0.0*corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
+        return lambda x: 1.0
     else:
         return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
 
@@ -227,7 +238,8 @@ def effectiveXS(sigma_p, m_X, A, v = 1.0):
     m_A = 0.9315*A
     mu_A = m_A*m_X/(m_A + m_X)
     mu_p = m_p*m_X/(m_p + m_X)
-    #(v**-4)
+    
+    #v**-4
     return sigma_p*(1.0/(m_X*m_A))*(A**2)*(mu_A**4/mu_p**2)
     
 
@@ -243,7 +255,7 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp):
     
     fint = tlist*0.0
     for i in range(len(tlist)):
-        #If maximum vf you can get this value of theta is greater
+        #If maximum vf you can get for this value of theta is greater
         #than the speed we're interested in, set to zero
         if (vmax_interp(tlist[i]) < vf): 
             fint[i] = 0.0
@@ -257,7 +269,7 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp):
 #Integrand for calculating the final speed distribution at the detector
 def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, target):
     #Calculate the initial velocity corresponding to this final velocity vf
-    dv = 1.5
+    dv = 0.1
     vi1 = calcVinitial_full(vf+dv/2.0, theta,  depth, sigma_p, m_x, target)
     vi2 = calcVinitial_full(vf-dv/2.0, theta,  depth, sigma_p, m_x, target)
 
@@ -294,8 +306,23 @@ def dv_by_dD(v, D, params):
     #Loop over the relevant isotopes
     #BJK!
     for i in isovals:
-        res += dens_interp[i](r)*effectiveXS(sigma_p, m_x, Avals[i],v=v)*corr_interp[i](v)
+        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i])*corr_interp[i](v)
     return -1e2*v*res #(km/s)/m
+
+def dv_by_dD_concrete(v, D, params):
+
+    sigma_p, m_x = params
+    isovals = range(Niso)
+
+    #Density of isotopes just below the surface
+    r = R_E - 1.0
+
+    res = 0.0
+    #Loop over the relevant isotopes                              
+    for i in isovals:
+        #print(i, dens_interp(i, r))
+        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i])*corr_interp[i](v)
+    return -1e2*v*res #(km/s)/m   
 
 #Derivative for the case of Pb shielding
 def dv_by_dD_Pb(v, D, params):        
@@ -304,9 +331,9 @@ def dv_by_dD_Pb(v, D, params):
     A_Pb = 207
         
     sigma_p, m_x = params
-    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb, v=v)*corr_Pb(v)
+    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb)*corr_Pb(v)
     return -1e2*v*res #(km/s)/m
-
+    
 #Derivative for the case of Cu shielding
 def dv_by_dD_Cu(v, D, params):        
     #Cu density
@@ -314,8 +341,20 @@ def dv_by_dD_Cu(v, D, params):
     A_Cu = 63.5
         
     sigma_p, m_x = params
-    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu,v=v)*corr_Cu(v)
+    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu)*corr_Cu(v)
     return -1e2*v*res #(km/s)/m
+
+#Derivative for the case of Fe shielding  
+def dv_by_dD_Fe(v, D, params):
+    #Fe density                                                                                                                                              
+    #n_Fe = 7.874 #g/cm^3
+    n_Fe = 8.5e22
+    A_Fe = 55.85
+
+    sigma_p, m_x = params
+    res = n_Fe*effectiveXS(sigma_p, m_x, A_Fe)*corr_Fe(v)
+    return -1e2*v*res #(km/s)/m  
+
 
 #Calculate the final velocity after propagating across 'target'
 #Here, target = "atmos" or "earth"
@@ -332,7 +371,7 @@ def calcVfinal(vi, theta,  depth, sigma_p, m_x, target="full"):
         d1 = pathLength(depth, theta) - pathLength_Earth(depth, theta)
         d2 = pathLength(depth, theta)
     
-    psoln = odeint(dv_by_dD, vi, [d1,d2] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD, vi, [d1,d2] , args=(params,), mxstep=NSTEP, rtol=TOL)
     vf = psoln[1]
     return vf
     
@@ -341,16 +380,19 @@ def calcVfinal(vi, theta,  depth, sigma_p, m_x, target="full"):
 #Recommend using target="MPI" or "SUF" depending on the detector
 def calcVfinal_full(vi, theta,  depth, sigma_p, m_x, target="full"):
     vf = 1.0*vi
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="atmos")
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE"]):
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="earth") 
     if (target == "MPI"):
         vf = calcVfinal_shield_MPI(vf, sigma_p, m_x)
     if (target == "SUF"):
         vf = calcVfinal_shield_SUF(vf, sigma_p, m_x)
     if (target == "EDE"):
-        vf = calcVfinal_shield_EDE(vf, sigma_p, m_x)
+        vf = calcVfinal_shield_EDE(vf, theta, sigma_p, m_x)
+    if (target == "MOD"):
+        vf = calcVfinal_shield_MOD(vf, sigma_p, m_x)
+        
     return vf
     
 #Calculate the initial velocity (for a given final velocity) after propagating across 'target'
@@ -368,7 +410,7 @@ def calcVinitial(vf, theta,  depth, sigma_p, m_x, target="earth"):
         d1 = pathLength(depth, theta) - pathLength_Earth(depth, theta)
         d2 = pathLength(depth, theta)
     
-    psoln = odeint(dv_by_dD, vf, [d2,d1], args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD, vf, [d2,d1], args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
 #Calculate the initial speed at the top of the atmosphere for a 
@@ -381,10 +423,13 @@ def calcVinitial_full(vf, theta,  depth, sigma_p, m_x, target="full"):
     if (target == "SUF"):
         vi = calcVinitial_shield_SUF(vi, sigma_p, m_x)
     if (target == "EDE"):
-        vi = calcVinitial_shield_EDE(vi, sigma_p, m_x)
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE"]):
+        vi = calcVinitial_shield_EDE(vi, theta, sigma_p, m_x)
+    if (target == "MOD"):
+        vi = calcVinitial_shield_MOD(vi, sigma_p, m_x)
+        
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="earth")
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="atmos")
 
     return vi
@@ -393,39 +438,127 @@ def calcVinitial_full(vf, theta,  depth, sigma_p, m_x, target="full"):
 def calcVfinal_shield_SUF(v0, sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 16cm of Lead
-    psoln = odeint(dv_by_dD_Pb, v0, [0,16.0e-2] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Pb, v0, [0,16.0e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
 def calcVinitial_shield_SUF(v0,  sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 16cm of Lead (backwards)
-    psoln = odeint(dv_by_dD_Pb, v0, [16.0e-2,0] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Pb, v0, [16.0e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
+    
+    
+def calcVfinal_shield_MOD(v0, sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 20cm of Lead
+    psoln = odeint(dv_by_dD_Pb, v0, [0,20.0e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)
+    return psoln[1]
+    
+def calcVinitial_shield_MOD(v0,  sigma_p, m_x):
+    params = [sigma_p, m_x]
+    #Propagate through 20cm of Lead (backwards)
+    psoln = odeint(dv_by_dD_Pb, v0, [20.0e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
+    return psoln[1]
+    
+
 
 #Calculate final (or initial) speed after crossing the Copper shielding at MPI
 def calcVfinal_shield_MPI(v0, sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 1mm Copper
-    psoln = odeint(dv_by_dD_Cu, v0, [0,1e-3] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Cu, v0, [0,1e-3] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
 def calcVinitial_shield_MPI(v0, sigma_p, m_x):
     params = [sigma_p, m_x]
     #Propagate through 1mm Copper
-    psoln = odeint(dv_by_dD_Cu, v0, [1e-3,0] , args=(params,), mxstep=1000, rtol=1e-6)
+    psoln = odeint(dv_by_dD_Cu, v0, [1e-3,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
 
+hdet = 0.3 #height of EDE detector from the inner lead radius, 30cm
+hroom = 3.4 #height of room, 3.4m
+hfloor = 1.5 #height of EDE detector from the floor of the room, 1.5m
+Lroom = 1.5 #Side length of the room, 4m 
+
+a_ceil = np.pi - np.arctan(Lroom/(hroom - hfloor))
+a_floor = np.arctan(Lroom/hfloor)
+a_bottom = np.arctan(0.5/(hdet + 0.1))
+a_lead = np.pi - np.arctan(0.234/(0.83 - hdet))
+a_steel = np.pi - np.arctan(0.215/(1.5-hdet))
+
+#print "alpha_ceil:", a_ceil*180/np.pi
+#print "alpha_floor:", a_floor*180/np.pi
+#print "alpha_bottom:", a_bottom*180/np.pi
+#print "alpha_lead:", a_lead*180/np.pi
+#print "alpha_steel", a_steel*180/np.pi
+
+
 #Calculate final (or initial) speed after crossing the Lead shielding at EDE...
-def calcVfinal_shield_EDE(v0, sigma_p, m_x):
+def calcVfinal_shield_EDE(v0, theta, sigma_p, m_x):
     params = [sigma_p, m_x]
-    #Propagate through 16cm of Lead
-    psoln = odeint(dv_by_dD_Pb, v0, [0,10.0e-2] , args=(params,), mxstep=1000, rtol=1e-6)
-    return psoln[1]
+
+    #Walls of the room                                                                                                                                       
+    D_walls = 0.4
+    if (theta > a_ceil):
+        D_walls = 0.2
+    elif (theta <a_floor):
+        D_walls= 0.1
+
+    delta = 0.0
+    D_walls *= (1+delta)
+
+    v1 = odeint(dv_by_dD_concrete, v0, [0,D_walls] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Steel bottom
+    if (theta < a_bottom):
+        v1 = odeint(dv_by_dD_Fe, v1, [0,10.e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Lead shielding
+    if (theta < a_lead):
+        v1 = odeint(dv_by_dD_Pb, v1, [0,10.e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Steel can
+    D_steel = 1.5e-3
+    if (theta > a_steel):
+        D_steel = 2.5e-2
+    v1 = odeint(dv_by_dD_Fe, v1, [0,D_steel] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Copper elements
+    D_copper = 6e-2
+    v1 = odeint(dv_by_dD_Cu, v1, [0,D_copper] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    return v1
     
-def calcVinitial_shield_EDE(v0,  sigma_p, m_x):
+def calcVinitial_shield_EDE(v0, theta,  sigma_p, m_x):
     params = [sigma_p, m_x]
-    #Propagate through 16cm of Lead (backwards)
-    psoln = odeint(dv_by_dD_Pb, v0, [10.0e-2,0] , args=(params,), mxstep=1000, rtol=1e-6)
-    return psoln[1]
+ 
+    #Copper elements                                                                                                                                         
+    D_copper = 6e-2
+    v1 = odeint(dv_by_dD_Cu, v0, [D_copper,0] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Steel can                                                                                                                                               
+    D_steel = 1.5e-3
+    if (theta > a_steel):
+        D_steel = 2.5e-2
+    v1 = odeint(dv_by_dD_Fe, v1, [D_steel,0] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Lead shielding                                                                                                                                          
+    if (theta < a_lead):
+        v1 = odeint(dv_by_dD_Pb, v1, [10.e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Steel bottom                                                                                                                                            
+    if (theta < a_bottom):
+        v1 = odeint(dv_by_dD_Fe, v1, [10.e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    #Walls of the room                                                                                                                                       
+    D_walls = 0.4
+    if (theta > a_ceil):
+        D_walls = 0.2
+    elif (theta < a_floor):
+        D_walls = 0.1
+
+    v1 = odeint(dv_by_dD_concrete, v1, [D_walls,0] , args=(params,), mxstep=NSTEP, rtol=TOL)[1]
+
+    return v1
 
     

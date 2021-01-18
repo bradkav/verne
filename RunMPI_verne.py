@@ -40,38 +40,47 @@ N_runs = nprocs*block_size
 full_inds = np.arange(N_runs) + index*N_runs
 this_inds = np.arange(block_size) + rank*block_size
 
-current_m_vals = mx_vals[full_inds[this_inds]]
-current_sig_vals = sig_vals[full_inds[this_inds]]
+index_list = full_inds[this_inds]
+
+#current_m_vals = mx_vals[full_inds[this_inds]]
+#current_sig_vals = sig_vals[full_inds[this_inds]]
+
+
 
 #Directory where the calc files are located
 myDir = "/home/kavanagh/verne/"
 cmd = "cd "+myDir+" ; "
 
-for mx, sig in zip(current_m_vals, current_sig_vals):
-#Output file labelled by r_np and exposure index
-    outfile = "outputs/out_"+args.target+"_lmx" + '{0:.2f}'.format(np.log10(mx)) + "_lsig" + '{0:.2f}'.format(np.log10(sig))+".txt"
+#for mx, sig in zip(current_m_vals, current_sig_vals):
+for i in index_list:
+    if (i < len(mx_vals)):
+        mx = mx_vals[i]
+        sig = sig_vals[i]
     
-    cmd += "python3 src/CalcVelDist.py "
-    cmd += "-m_x " + str(mx)
-    cmd += " -sigma_p " + str(sig)
-    cmd += " -loc " + str(args.target)
-    cmd += " >> " + outfile + "; "
+        #Output file labelled by r_np and exposure index
+        outfile = "outputs/out_"+args.target+"_lmx" + '{0:.2f}'.format(np.log10(mx)) + "_lsig" + '{0:.2f}'.format(np.log10(sig))+".txt"
+        
+        cmd += "python3 src/CalcVelDist.py "
+        cmd += " -m_x " + str(mx)
+        cmd += " -sigma_p " + str(sig)
+        cmd += " -loc " + str(args.target)
+        cmd += " >> " + outfile + "; "
 
-calculate_rate = False
-
-if (calculate_rate):
-
-    if (args.target == "SUF"):
-        cmd += " ; python CalcRate_CDMS.py -m_x " + str(args.m_x)
-    elif (args.target == "MPI"):
-        cmd += " ; python CalcRate_nucleus.py -m_x " + str(args.m_x)
-    elif (args.target == "EDE"):
-        cmd += " ; python CalcRate_EDE.py -m_x " + str(args.m_x)
-    
-    cmd += " -sigma_p " + str(sig)
-    cmd += " >> " + outfile
+#calculate_rate = False
+#
+#if (calculate_rate):
+#
+#    if (args.target == "SUF"):
+#        cmd += " ; python CalcRate_CDMS.py -m_x " + str(args.m_x)
+#    elif (args.target == "MPI"):
+#        cmd += " ; python CalcRate_nucleus.py -m_x " + str(args.m_x)
+#    elif (args.target == "EDE"):
+#        cmd += " ; python CalcRate_EDE.py -m_x " + str(args.m_x)
+#    
+#    cmd += " -sigma_p " + str(sig)
+#    cmd += " >> " + outfile
 
 print cmd
     
-#sts = call(cmd,shell=True)
+sts = call(cmd,shell=True)
 comm.Barrier()

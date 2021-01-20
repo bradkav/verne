@@ -37,7 +37,7 @@ mx_vals, sig_vals = np.loadtxt("data/param_grid.txt", unpack=True)
 
 N_runs = nprocs*block_size
 
-full_inds = np.arange(N_runs) + index*N_runs
+full_inds = np.arange(N_runs) + args.index*N_runs
 this_inds = np.arange(block_size) + rank*block_size
 
 index_list = full_inds[this_inds]
@@ -61,7 +61,7 @@ for i in index_list:
         outfile = "outputs/out_"+args.target+"_lmx" + '{0:.2f}'.format(np.log10(mx)) + "_lsig" + '{0:.2f}'.format(np.log10(sig))+".txt"
         
         cmd += "python3 src/CalcVelDist.py "
-        cmd += " -m_x " + str(mx)
+        cmd += " -m_x " + str(mx/1e3)
         cmd += " -sigma_p " + str(sig)
         cmd += " -loc " + str(args.target)
         cmd += " >> " + outfile + "; "

@@ -44,6 +44,12 @@ as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1
 
 The `verne` code has been used (in some form or another) in the follow research papers:
 
-- *Earth-Scattering of super-heavy Dark Matter: updated constraints from detectors old and new*, B. J. Kavanagh (2017), [arXiv:1712.04901](https://arxiv.org/abs/1712.04901)  
-- *Searching for low-mass dark matter particles with a massive Ge bolometer operated above-ground*, EDELWEISS Collaboration & B. J. Kavanagh (2019), [arXiv:1901.03588](https://arxiv.org/abs/1901.03588)  
+- *Etching Plastic Searches for Dark Matter*, A. Bhoonah, J. Bramante, B. Courtman & N. Song (2020), [arXiv:2012.13406](https://arxiv.org/abs/2012.13406)  
+- *Detecting Composite Dark Matter with Long Range and Contact Interactions in Gas Clouds*, A. Bhoonah, J. Bramante, S. Schon & N. Song (2020), [arXiv:2010.07240](https://arxiv.org/abs/2010.07240)  
+- *Migdal effect and photon Bremsstrahlung: improving the sensitivity to light dark matter of liquid argon experiments*, G. Grilli di Cortona, A. Messina & S. Piacentini (2020), [arXiv:2006.02453](https://arxiv.org/abs/2006.02453)  
+- *Measuring the local Dark Matter density in the laboratory*, B. J. Kavanagh, T. Emken & R. Catena (2020), [arXiv:2004.01621](https://arxiv.org/abs/2004.01621)  
 - *A Search for Light Dark Matter Interactions Enhanced by the Migdal effect or Bremsstrahlung in XENON1T*, Xenon1T Collaboration (2019), [arXiv:1907.12771](https://arxiv.org/abs/1907.12771)
+- *Searching for low-mass dark matter particles with a massive Ge bolometer operated above-ground*, EDELWEISS Collaboration & B. J. Kavanagh (2019), [arXiv:1901.03588](https://arxiv.org/abs/1901.03588)  
+- *Earth-Scattering of super-heavy Dark Matter: updated constraints from detectors old and new*, B. J. Kavanagh (2017), [arXiv:1712.04901](https://arxiv.org/abs/1712.04901)  
+
+

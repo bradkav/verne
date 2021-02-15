@@ -16,7 +16,7 @@ results_dir = "results/"
 parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
 parser.add_argument('-sigma_p','--sigma_p', help='DM-nucleon cross section, sigma_p in cm^2', type=float, required=True)
-parser.add_argument('-loc','--location', help='Detector location to consider. `MPI` or `SUF`', type=str, required=True)
+parser.add_argument('-loc','--location', help='Detector location to consider.', type=str, required=True)
 parser.add_argument('-interaction', '--interaction', help='Interaction type: `SI` or `SD`', type=str, default="SI")
 args = parser.parse_args()
 m_x = args.m_x
@@ -40,6 +40,8 @@ if (loc == "SUF"):
 elif (loc == "MPI"):
     depth = 0.3 #metres
 elif (loc == "EDE"):
+    depth = 0.0 #metres
+elif (loc == "surface"):
     depth = 0.0 #metres
 elif (loc == "MOD"):
     depth = 1700.0
@@ -128,5 +130,10 @@ fname = results_dir + "veldists/f_" + interaction + "_" + loc + "_mx" + '{0:.3f}
 headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\nloc: " + target
 headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
 
-np.savetxt(fname, np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()]), header=headertxt)
+#Try different locations to save files, depending on where
+#the code is being executed from
+try:
+    np.savetxt(fname, np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()]), header=headertxt)
+except:
+    np.savetxt("../" + fname, np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()]), header=headertxt)
     

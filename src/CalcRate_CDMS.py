@@ -38,7 +38,7 @@ def eff(E):
 def rate_prefactor(A, m_x):
     rho0 = 0.3
     mu = 1.78e-27*(m_x*0.9315)/(m_x + 0.9315)
-    return 1.38413e-12*rho0/(4.0*np.pi*m_x*mu*mu)
+    return 1.38413e-12*rho0/(2.0*m_x*mu*mu)
 
 #Stanford
 lat_SUF = +37.4 #N

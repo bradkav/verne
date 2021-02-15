@@ -12,6 +12,8 @@ from scipy.integrate import quad, simps
 from scipy.interpolate import interp1d, interp2d
 from scipy.integrate import odeint
 import scipy.special
+import os
+import sys
 
 import MaxwellBoltzmann as MB
 
@@ -66,9 +68,14 @@ def loadIsotopes():
     global Niso_full
     global r_list
     
+    #Depending on the required directory structure, try 
+    #two possible locations for the data files
     rootdir = "data/"
-    #rootdir = "../data/"
-    
+    if not (os.path.exists(rootdir + "isotopes.txt")):
+        rootdir = "../data/"
+    if not (os.path.exists(rootdir + "isotopes.txt")):
+        sys.exit("Data files (isotopes, density profiles, etc.) not found in 'data/' or '../data/'...")
+        
     #Load in Earth isotopes
     Avals = np.loadtxt(rootdir+"isotopes.txt", usecols=(1,)) 
     isotopes = np.loadtxt(rootdir+"isotopes.txt", usecols=(0,))
@@ -194,8 +201,8 @@ def ERmax(mX, mA, v):
 #for nucleon number A0 and recoil energy E
 def calcSIFormFactor(E, A0):
         #Helm
-        if (E < 1e-5):
-            return 1.0
+        #if (E < 1e-5):
+        #    return 1.0
 
         #Define conversion factor from amu-->keV
         amu = 931.5*1e3
@@ -380,9 +387,9 @@ def calcVfinal(vi, theta,  depth, sigma_p, m_x, target="full"):
 #Recommend using target="MPI" or "SUF" depending on the detector
 def calcVfinal_full(vi, theta,  depth, sigma_p, m_x, target="full"):
     vf = 1.0*vi
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD", "surface"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="atmos")
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD", "surface"]):
         vf = calcVfinal(vf, theta,  depth, sigma_p, m_x, target="earth") 
     if (target == "MPI"):
         vf = calcVfinal_shield_MPI(vf, sigma_p, m_x)
@@ -427,9 +434,9 @@ def calcVinitial_full(vf, theta,  depth, sigma_p, m_x, target="full"):
     if (target == "MOD"):
         vi = calcVinitial_shield_MOD(vi, sigma_p, m_x)
         
-    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
+    if (target in ["earth", "full", "no_shield", "SUF", "MPI", "EDE", "MOD", "surface"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="earth")
-    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD"]):
+    if (target in ["atmos", "full", "no_shield", "SUF", "MPI", "EDE", "MOD", "surface"]):
         vi = calcVinitial(vi, theta,  depth, sigma_p, m_x, target="atmos")
 
     return vi

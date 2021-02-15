@@ -10,8 +10,9 @@ phi_interp = None
 #----------------------------------------------
 
 
-vesc = 533.0
-sigmav=156.0
+vesc = 544.0 #Escape velocity
+sigmav = 156.0  #Velocity dispersion (v_0/sqrt(2))
+ve = 232.0  #Earth peculiar velocity around GC
 
 
 # Nesc - normalisation constant
@@ -68,7 +69,6 @@ def calcf_integ(v, theta, gamma):
     if (np.sin(gamma)*np.sin(theta) <= 1e-10):
         return 2.0*np.pi*VelDist(v, theta, 0, gamma)
     
-    ve = np.sqrt(2.0)*sigmav
     delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta)
     
     cosmin = (v**2 + ve**2 - vesc**2)/(2*v*ve*np.sin(gamma)*np.sin(theta))\
@@ -84,7 +84,6 @@ def calcf_integ(v, theta, gamma):
 #Full 3-D velocity distribution (v, theta, phi)
 def VelDist(v, theta, phi, gamma):
     cdel = np.sin(gamma)*np.sin(theta)*np.cos(phi) + np.cos(gamma)*np.cos(theta)
-    ve = np.sqrt(2.0)*sigmav
     dsq = v**2 - 2*v*ve*cdel + ve**2
     A = np.exp(-dsq/(2*sigmav**2))/NNORM
     if hasattr(A, "__len__"):
@@ -97,7 +96,6 @@ def VelDist(v, theta, phi, gamma):
 #Calculate the free MB speed distribution 
 #after integrating over all angles
 def calcf_SHM(v):
-    ve = np.sqrt(2)*sigmav
     beta = ve/(sigmav**2)
     N1 = 1.0/(Nesc*sigmav**3*np.sqrt(2*np.pi))
     f = v*0.0

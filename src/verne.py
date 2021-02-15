@@ -201,8 +201,8 @@ def ERmax(mX, mA, v):
 #for nucleon number A0 and recoil energy E
 def calcSIFormFactor(E, A0):
         #Helm
-        #if (E < 1e-5):
-        #    return 1.0
+        if (E < 1e-5):
+            return 1.0
 
         #Define conversion factor from amu-->keV
         amu = 931.5*1e3

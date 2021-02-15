@@ -44,7 +44,6 @@ def getVelDist(m_x, sigma, gamma_ind):
 
 #Calculate velocity integral from an interpolation function
 #defining f(v) and a maximum speed vmax=800 km/s
-@np.vectorize
 def calcEta(v, interpfun):
     return quad(lambda x: interpfun(x)/x, v, 800.0, epsrel=1e-3)[0]
 
@@ -58,6 +57,7 @@ def rate_prefactor(A, m_x):
     return 1.38413e-12*rho0/(2.0*m_x*mu*mu)
 
 #Calculate recoil spectrum
+@np.vectorize
 def dRdE(E, A, mx,sig,f_interp):  
     int_factor = sig*verne.calcSIFormFactor(E, A)*A**2
     return rate_prefactor(A, mx)*int_factor*calcEta(MB.vmin(E, A, mx),  f_interp)
@@ -100,7 +100,7 @@ dRdE_verne = dRdE(E_list, 28, 0.500, 1e-40, f_interp)
 #If WIMpy is installed - cross check using that code too
 if (WIMpy_installed):
     #Check against the standard rate without Earth-stopping
-    dRdE_WIMpy_free = WIMpy.DMUtils.dRdE_standard(E_list, N_p=14, N_n=14, m_x=0.5, sig=1e-40)
+    dRdE_WIMpy_free = WIMpy.DMUtils.dRdE_standard(E_list, N_p=14, N_n=14, m_x=0.5, sig=1e-40, vlag=232, vesc=544.0)
     
     #WIMpy also allows you to feed in a generic function for
     # eta(vmin) = int_vmin^infty f(v)/v dv, so let's try that

@@ -3,16 +3,16 @@
 [![DOI](https://zenodo.org/badge/112917758.svg)](https://zenodo.org/badge/latestdoi/112917758) [![arXiv](https://img.shields.io/badge/arXiv-1712.04901-B31B1B.svg)](https://arxiv.org/abs/1712.04901) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 
-Verne is a python code for calculating the Earth-stopping effect for super-heavy Dark Matter (DM). 
+Verne is a python code for calculating the Earth-stopping effect for Dark Matter (DM). 
 
-The code allows you to calculate the speed distribution (and DM signal rate) at two detector locations: MPI (the Max-Planck-Institute in Munich) and SUF (the Stanford Underground Facility). This can be done for a range of DM masses and cross sections (though the results will be most reliable for very heavy DM particles). Further details about the physics behind the code can be found in [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).
+The code allows you to calculate the speed distribution (and DM signal rate) at detectors in the Earth's atmosphere, on the Earth's surface and at underground detector locations, such as MPI (the Max-Planck-Institute in Munich) and SUF (the Stanford Underground Facility). This can be done for a range of DM masses and cross sections (though the results will be most reliable for very heavy DM particles). This is because the code implements a 'continuous stopping' formalism, with DM particles travelling on straight-line trajectories. Further details about the physics behind the code can be found in [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).
 
-The code will soon be updated with more detailed documentation and more examples. The core of the code (the `verne` module) is in the [src](src) folder, head there for some details of how to use the code. More information about the inner workings will appear soon.
+The core of the code (the `verne` module) is in the [src](src) folder, head there for some details of how to use the code.
 
-*If you would like to use verne for spin-dependent interactions, please get in touch. I have some code for this but I haven't yet found the time to 'officially' update this repo.*
 
 ### Version history
 
+**Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.
 **Version 1.1 (12/02/2018):** Updated event rate calculation to account for correct CRESST exposure times. Minor edits to text.  
 **Version 1.0 (14/12/2017):** Initial release (including arXiv numbers, etc.)  
 **Version 0.9 (13/12/2017):** Pre-release before arXiv submission.  
@@ -28,7 +28,10 @@ The code will soon be updated with more detailed documentation and more examples
 
 ### Dependencies
 
-The code is compatible with Python2.7. Requires [numpy](http://www.numpy.org) and [scipy](https://www.scipy.org). More detailed dependencies can be found in `requirements.txt`.
+The code is compatible with Python3. Requires [numpy](http://www.numpy.org) and [scipy](https://www.scipy.org). More detailed dependencies can be found in `requirements.txt`.
+
+Some code is included for calculating nuclear recoil spectra in direct detection experiments, but we recommend using [`WIMpy`](https://github.com/bradkav/WIMpy_NREFT) (which is more flexible and more complete) for recoil spectra calculations.
+
 
 ### Citing Verne
 

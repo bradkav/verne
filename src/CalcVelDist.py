@@ -4,6 +4,8 @@ from scipy.interpolate import interp1d
 import MaxwellBoltzmann as MB
 import argparse
 
+import verne as verne
+
 try:
     from tqdm import tqdm
 except:
@@ -17,18 +19,14 @@ parser = argparse.ArgumentParser(description='...')
 parser.add_argument('-m_x','--m_x', help='DM mass in GeV', type=float,default = 1e5)
 parser.add_argument('-sigma_p','--sigma_p', help='DM-nucleon cross section, sigma_p in cm^2', type=float, required=True)
 parser.add_argument('-loc','--location', help='Detector location to consider.', type=str, required=True)
-parser.add_argument('-interaction', '--interaction', help='Interaction type: `SI` or `SD`', type=str, default="SI")
+parser.add_argument('-int', '--interaction', help='Interaction type: `SI` or `SD`', type=str, default="SI")
 args = parser.parse_args()
 m_x = args.m_x
 sigma_p = args.sigma_p
 loc = args.location
 interaction = args.interaction
 
-if (interaction == "SI"):
-    import verne as verne
-elif (interaction == "SD"):
-    import verne_SD as verne
-else:
+if (interaction not in  ["SI", "SD"]):
     print(">Unknown interaction type <", interaction, ">...")
     exit()
 
@@ -72,6 +70,8 @@ v_th = 1e0 #Lowest speed to consider (don't go lower than v_th km/s, other the c
 
 def getVelDist(gamma):
     
+    #It's useful to calculate the maximum final speed for particles reaching the detector from a given direction
+    #in order not to waste time calculating the speed distribution for values of v_f which are impossible.
     print(">    Calculating maximum final speed...")
     a = 1.0
     b = 2*v_e*(-np.sin(gamma)*np.sin(np.pi-thetavals) + np.cos(gamma)*np.cos(np.pi-thetavals))
@@ -81,7 +81,7 @@ def getVelDist(gamma):
     #Calculate the maximum final speed as a function of incoming angle theta
     v_final_max = 0.0*v_initial_max
     for i in tqdm(range(Nvals)):
-        v_final_max[i] = verne.calcVfinal_full(v_initial_max[i], thetavals[i],  depth, sigma_p, m_x, target)
+        v_final_max[i] = verne.calcVfinal_full(v_initial_max[i], thetavals[i],  depth, sigma_p, m_x, interaction, target)
 
     #Calculate interpolation function for max final speed
     vmax = np.max(v_final_max)
@@ -102,7 +102,7 @@ def getVelDist(gamma):
     vlist = np.sort(vlist)
     f_final = 0.0*vlist
     for i in tqdm(range(len(vlist))):
-        f_final[i] = verne.CalcF(vlist[i], gamma, depth, sigma_p, m_x, target, vfinal_interp)
+        f_final[i] = verne.CalcF(vlist[i], gamma, depth, sigma_p, m_x, target, vfinal_interp, interaction=interaction)
 
     #Add on the final point
     vlist = np.append(vlist, vmax)
@@ -112,7 +112,7 @@ def getVelDist(gamma):
     
     
 #Loop over gamma values
-N_gamma = 11 #Do 21 in future
+N_gamma = 11
 Nv1 = 20 #Near the velocity threshold
 Nv2 = 40 #Everywhere else
 Nv = Nv1 + Nv2 + 1 + 1 #Add an extra one for 20 km/s

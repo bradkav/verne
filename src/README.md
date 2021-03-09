@@ -13,29 +13,36 @@ Then you need to do some initialisation:
 
 `verne.loadFFcorrections(m_x)` - this tabulates the correction factors due to Nuclear form factors. It must be reloaded for each new DM mass you want to calculate for.
 
+Note that there is a hard-coded flag `NEGLECT_FF` which you can set to true to neglect corrections due to form factors (which should be valid for low-mass DM). 
+
 ### Scripts
 
 To calculate the speed distribution at a detector, for a range of values of gamma and v, use:
 
 ```python
-python CalcVelDist.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION
+python3 CalcVelDist.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION -int INTERACTION
 ```
 where
 `M_X` is the DM mass in GeV  
 `SIGMA_P` is the DM-nucleon cross section in cm^2  
-`LOCATION` is the detector location, "MPI" or "SUF".
+`LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
+`INTERACTION` is the type of the type of interaction, either "SI" or "SD" (for Spin-independent or spin-dependent interactions).
 
-Note that this will save a file into `results/veldists` and will probably take about 1 hour on a single core.
+Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module.
 
-The number of signal events at a given detector is then calculated with
+A general example (which performs an example velocity distribution calculation and event rate calculation) can be run with:
+```
+python3 Test.py
+```
+Some more specific examples, calculating the number of signal events at specific detectors, can be run with:
 ```python
-python CalcRate_nucleus.py -m_x M_X -sigma_p SIGMA_P
+python3 CalcRate_nucleus.py -m_x M_X -sigma_p SIGMA_P
 ```
 or 
 ```python
-python CalcRate_CDMS.py -m_x M_X -sigma_p SIGMA_P
+python3 CalcRate_CDMS.py -m_x M_X -sigma_p SIGMA_P
 ```
-depending on the detector. This will read in the relevant file from `results/veldists` and calculate the corresponding event rate and number of signal events, appending to a file in `results/Nevents`.
+depending on the detector. This will read in the relevant file from `results/veldists` and calculate the corresponding event rate and number of signal events, appending to a file in `results/Nevents`. 
 
 The file `RunMPI_verne.py` is also provided, which helps with paralellising these calculations. It essentially launches a number of copies `CalcVelDist.py` in parallel using MPI, so that the grid scan can be performed more quickly.
 

@@ -23,10 +23,10 @@ To calculate the speed distribution at a detector, for a range of values of gamm
 python3 CalcVelDist.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION -int INTERACTION
 ```
 where
-`M_X` is the DM mass in GeV  
-`SIGMA_P` is the DM-nucleon cross section in cm^2  
-`LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
-`INTERACTION` is the type of the type of interaction, either "SI" or "SD" (for Spin-independent or spin-dependent interactions).
+   - `M_X` is the DM mass in GeV  
+  - `SIGMA_P` is the DM-nucleon cross section in cm^2  
+  - `LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
+  - `INTERACTION` is the type of the type of interaction, either "SI" or "SD" (for Spin-independent or spin-dependent interactions).
 
 Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module.
 

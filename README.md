@@ -12,7 +12,7 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 
 ### Version history
 
-**Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.
+**Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.  
 **Version 1.1 (12/02/2018):** Updated event rate calculation to account for correct CRESST exposure times. Minor edits to text.  
 **Version 1.0 (14/12/2017):** Initial release (including arXiv numbers, etc.)  
 **Version 0.9 (13/12/2017):** Pre-release before arXiv submission.  

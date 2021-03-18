@@ -28,7 +28,7 @@ where
   - `LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
   - `INTERACTION` is the type of the type of interaction, either "SI" or "SD" (for Spin-independent or spin-dependent interactions).
 
-Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module.
+Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module. The script `CalcVelDist.py` is actually just a command-line wrapper for the function in `CalcVelDist_function.py`, which may be useful if you want to call this from another python script.
 
 A general example (which performs an example velocity distribution calculation and event rate calculation) can be run with:
 ```

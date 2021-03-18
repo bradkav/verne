@@ -10,6 +10,8 @@ import MaxwellBoltzmann as MB
 import argparse
 import os.path
 
+import CalcVelDist_function
+
 import matplotlib.pyplot as plt
 
 try:
@@ -77,7 +79,8 @@ fv_file = "../results/veldists/f_SI_surface_mx0.500_lsig-36.00.txt"
 if  (os.path.isfile(fv_file) != True):
     print(">Test velocity distribution <../results/veldists/f_SI_surface_mx0.500_lsig-36.00.txt> not found.")
     print(">Generating from scratch...")
-    os.system("python3 CalcVelDist.py -m_x 0.5 -sigma_p 1e-36 -loc surface -int SI")
+    #os.system("python3 CalcVelDist.py -m_x 0.5 -sigma_p 1e-36 -loc surface -int SI")
+    CalcVelDist_function.calcVelDist_full(m_x=0.5, sigma_p=1e-36, loc="surface", interaction = "SI")
     print(">...done.")
 else:
     print(">Loading test velocity distribution <../results/veldists/f_SI_surface_mx0.500_lsig-36.00.txt>.")

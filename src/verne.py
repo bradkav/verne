@@ -291,7 +291,7 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp, interaction="SI"):
     
     
 #Integrand for calculating the final speed distribution at the detector
-def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, target, interaction):
+def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, interaction, target):
     #Calculate the initial velocity corresponding to this final velocity vf
     dv = 0.1
     vi1 = calcVinitial_full(vf+dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
@@ -316,7 +316,7 @@ def radius(D, theta, depth):
 #To be used by the ODE integrator
 def dv_by_dD(v, D, params):
 
-    theta, depth, sigma_p, m_x, target, interaction = params
+    theta, depth, sigma_p, m_x, interaction, target = params
     res = 0.0
     if (target == "atmos"):
         isovals = [8,9]
@@ -411,7 +411,7 @@ def dv_by_dD_Fe(v, D, params):
 #Calculate the final velocity after propagating across 'target'
 #Here, target = "atmos" or "earth"
 def calcVfinal(vi, theta,  depth, sigma_p, m_x, interaction="SI", target="full"):
-    params = [theta, depth, sigma_p, m_x, target, interaction]
+    params = [theta, depth, sigma_p, m_x, interaction, target]
 
     #Propagate across the atmosphere
     if (target == "atmos"):
@@ -450,7 +450,7 @@ def calcVfinal_full(vi, theta,  depth, sigma_p, m_x, interaction="SI", target="f
 #Calculate the initial velocity (for a given final velocity) after propagating across 'target'
 #Here, target = "atmos" or "earth"
 def calcVinitial(vf, theta,  depth, sigma_p, m_x, interaction="SI", target="earth"):
-    params = [theta, depth, sigma_p, m_x, target, interaction]
+    params = [theta, depth, sigma_p, m_x, interaction, target]
 
     #Propagate across the atmosphere
     if (target == "atmos"):

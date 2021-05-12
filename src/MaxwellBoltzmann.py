@@ -105,7 +105,7 @@ def calcf_SHM(v):
     
     b = (vesc-ve < v)&(v < vesc+ve)
     f[b] = np.exp(-(v[b]**2 + ve**2)/(2.0*sigmav**2))*(np.exp(beta*v[b]) - np.exp((v[b]**2 + ve**2 -vesc**2)/(2*sigmav**2)))
-    return f**v
+    return f*v*N1/beta
 
 #Minimum velocity required for a recoil of energy E_R
 def vmin(E, m_N, m_x):

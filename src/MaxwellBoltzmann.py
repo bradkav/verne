@@ -66,7 +66,7 @@ IntegralOverPhiVec = np.vectorize(IntegralOverPhi)
 #left is v and theta.
 def calcf_integ(v, theta, gamma):
     
-    if (np.sin(gamma)*np.sin(theta) <= 1e-10):
+    if (v*np.sin(gamma)*np.sin(theta) <= 1e-10):
         return 2.0*np.pi*VelDist(v, theta, 0, gamma)
     
     delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta)

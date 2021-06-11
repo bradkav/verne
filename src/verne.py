@@ -11,11 +11,22 @@ import numpy as np
 from scipy.integrate import quad, simps
 from scipy.interpolate import interp1d, interp2d
 from scipy.integrate import odeint
+
 import scipy.special
 import os
 import sys
 
 import MaxwellBoltzmann as MB
+
+from scipy.integrate import solve_ivp
+
+def odeint_new(f, v0, t_span , args, mxstep, rtol):
+    #print(v0)
+    result = solve_ivp(f, t_span, y0=np.atleast_1d(v0), args=args, rtol=rtol, method="RK23")
+    #print(result)
+    #print(result.y[0][-1])
+    return [result.t[-1], result.y[0][-1]]
+
 
 #--------------------
 #Theta = 0 is directly from BELOW, angles in radians
@@ -51,8 +62,8 @@ R_E = 6371.0e3  #Earth Radius in (m)
 #--------------------
 #Integration parameters
 
-TOL = 1e-4
-NSTEP = 100
+TOL = 1e-5
+NSTEP = 200
 
 
 #--------------------
@@ -293,14 +304,18 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp, interaction="SI"):
 #Integrand for calculating the final speed distribution at the detector
 def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, interaction, target):
     #Calculate the initial velocity corresponding to this final velocity vf
-    dv = 0.1
-    vi1 = calcVinitial_full(vf+dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
-    vi2 = calcVinitial_full(vf-dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
+    dv = 0.5
+    vi1 = calcVinitial_full(vf-dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
+    vi2 = calcVinitial_full(vf+dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
+    #vi3 = calcVinitial_full(vf+dv/2.0, theta,  depth, sigma_p, m_x, interaction, target)
+    #vi4 = calcVinitial_full(vf+dv, theta,  depth, sigma_p, m_x, interaction, target)    
 
     #Calculate the average and the numerical derivative
     vi = (vi1 + vi2)/2.0
     dvi_by_dvf = np.abs(vi1 - vi2)*1.0/dv
-
+    #vi = (vi1 + vi2 + vi3 + vi4)/4.0
+    #dvi_by_dvf = np.abs(-vi4 + 8*vi3 - 8*vi2 + vi1)*1.0/(6*dv)
+    
     return (dvi_by_dvf)*np.sin(theta)*(vi**2)*MB.calcf_integ(vi, theta, gamma)
  
 #Calculate the distance of a point from the centre of the Earth

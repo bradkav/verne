@@ -1,9 +1,9 @@
-#iso-value nucleon-number element-name
-1	16	Oxygen 
-2	28	Silicon
-3	24	Magnesium
-4	56	Iron
-5	40	Calcium
-7	23	Sodium
-8	32	Sulfur
-10	27	Aluminium
+#iso-value nucleon-number atomic-number element-name
+1	16	8	Oxygen 
+2	28	14	Silicon
+3	24	12	Magnesium
+4	56	26	Iron
+5	40	20	Calcium
+7	23	11	Sodium
+8	32	16	Sulfur
+10	27	13	Aluminium

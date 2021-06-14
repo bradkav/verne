@@ -40,11 +40,13 @@ isotopes = None
 dens_profiles = None
 dens_interp = None
 Avals = None
+Zvals = None
 Niso = None
 Niso_full = None
 r_list = None
 
 phi_interp = None
+
 corr_interp = None
 corr_Pb = None
 corr_Cu = None
@@ -58,6 +60,9 @@ isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, 
 h_A = 80e3  #Height of atmosphere in (m)
 R_E = 6371.0e3  #Earth Radius in (m)
 
+m_e = 511e-3 #Electron mass in GeV
+alpha = 1/137.03 #Fine structure constant
+q_screen = alpha*m_e #Electron screening momentum in GeV
 
 #--------------------
 #Integration parameters
@@ -74,7 +79,7 @@ def loadIsotopes():
     
     global dens_profiles
     global isotopes
-    global Avals
+    global Avals, Zvals
     global dens_interp
     global Niso
     global Niso_full
@@ -89,6 +94,7 @@ def loadIsotopes():
         sys.exit("Data files (isotopes, density profiles, etc.) not found in 'data/' or '../data/'...")
         
     #Load in Earth isotopes
+    Zvals = np.loadtxt(rootdir+"isotopes.txt", usecols=(2,))
     Avals = np.loadtxt(rootdir+"isotopes.txt", usecols=(1,)) 
     isotopes = np.loadtxt(rootdir+"isotopes.txt", usecols=(0,))
     Niso = len(isotopes)    #Number of #arth isotopes
@@ -116,6 +122,7 @@ def loadIsotopes():
     
     #Add the atmospheric elements:
     Avals = np.append(Avals,[16, 14])
+    Zvals = np.append(Zvals,[8,  7])
 
     #Load atmospheric parameters and 
     #calculate the atmosphere density profiles...
@@ -137,23 +144,20 @@ def dens_interp(index, r):
     
     
 #Generate interpolation functions for the Form Factor corrections (C_i(v))
-def loadFFcorrections(m_x):
-    global corr_interp
-    global corr_Pb
-    global corr_Cu
-    global corr_Fe
+def loadFFcorrections(m_x, interaction = "SI"):
+    global corr_interp, corr_Pb, corr_Cu, corr_Fe
 
    
     #Check that the isotope list has been loaded
     if (Avals is None):
         loadIsotopes()
     
-    print(">VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV...")
-    corr_interp = [calcFFcorrection(m_x, Avals[ID]) for ID in range(Niso_full)]
+    print(">VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV, with " + interaction + " interactions...")
+    corr_interp = [calcFFcorrection(m_x, Avals[ID], interaction) for ID in range(Niso_full)]
     #Also need Lead + Copper, for the shielding
-    corr_Pb = calcFFcorrection(m_x, 207) 
-    corr_Cu = calcFFcorrection(m_x, 63.5)
-    corr_Fe = calcFFcorrection(m_x, 55.8)
+    corr_Pb = calcFFcorrection(m_x, 207, interaction) 
+    corr_Cu = calcFFcorrection(m_x, 63.5, interaction)
+    corr_Fe = calcFFcorrection(m_x, 55.8, interaction)
 
 #International standard atmosphere, ISO 2533:1975
 #https://www.iso.org/standard/7472.html
@@ -236,33 +240,67 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
-def calcFFcorrection(m_x, A0):
-    v_vals = np.linspace(0, 1000, 200)
-    corr_fact = v_vals*0.0
-    for i, v in enumerate(v_vals):
-        corr_fact[i] = quad(lambda x: 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0), 0, 1)[0]
-    corr_fact[0] = 1.0
 
-    if (NEGLECT_FF):
-        #return interp1d(v_vals, 1.0+0.0*corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
-        return lambda x: 1.0
+def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
+    if (interaction.lower() == "SI".lower()):
+        return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
+        
+    elif (interaction.lower() == "Millicharge".lower()):
+        m_A = 0.9315*A0
+        mu_A = m_A*m_x/(m_A + m_x)
+        q_max = 2*mu_A*v/3e5
+        x_s = (q_screen/q_max)**2
+        return (1/np.log(1/x_s))*(1/x)*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
+        
     else:
-        return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
+        return 1.0
+
+def calcFFcorrection(m_x, A0, interaction = "SI"):
+    if (NEGLECT_FF):
+        return lambda x: 1.0
+    
+    v_vals = np.linspace(0.001, 1000, 200)
+    corr_fact = v_vals*0.0
+    
+    x_min = 0
+    x_max = 1
+    for i, v in enumerate(v_vals):
+        if (interaction.lower() == "Millicharge".lower()):
+            m_A = 0.9315*A0
+            mu_A = m_A*m_x/(m_A + m_x)
+            q_max = 2*mu_A*v/3e5
+            x_s = (q_screen/q_max)**2
+            x_min = x_s
+            x_max = 1
+        
+        if (x_min < x_max):
+            corr_fact[i] = quad(lambda x: FFcorrection_integrand(x, v, m_x, A0, interaction), x_min, x_max)[0]
+        else:
+            corr_fact[i] = 0.0
+            
+    if (interaction.lower() == "SI".lower()):
+        corr_fact[0] = 1.0
+    elif (interaction.lower() == "Millicharge".lower()):
+        corr_fact[0] = 0.0
+        
+    
+    return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
 
 
 #Calculate the DM-nucleus 'effective' cross section
 #which takes into account the average energy loss
-def effectiveXS(sigma_p, m_X, A, interaction="SI"):
+#  sigma_effective = sigma*<E_R>/(m_x v^2)
+def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
     m_p = 0.9315 #Proton mass
-    m_A = 0.9315*A
+    m_A = m_p*A
     mu_A = m_A*m_X/(m_A + m_X)
     mu_p = m_p*m_X/(m_p + m_X)
     
     #C is 'interaction enhancement' factor
-    if (interaction == "SI"):
+    if (interaction.lower() == "SI".lower()):
         C = A**2
         
-    elif (interaction == "SD"):
+    elif (interaction.lower() == "SD".lower()):
         #Include SD only for nitrogen - valid for coupling purely to protons OR neutrons only
         #Neglecting a subdominant contribution from Oxygen-17 in the atmosphere
         if (A == 14):
@@ -271,8 +309,13 @@ def effectiveXS(sigma_p, m_X, A, interaction="SI"):
             C = (4./3.)*((J_N + 1)/J_N)*S**2
         else:
             C = 0.0
+    elif (interaction.lower() == "Millicharge".lower()):
+        v_ref = 3e5*alpha*m_e/(2*mu_A)
+        if (v < v_ref):
+            return 0.0
+        C = Z**2*(2*v_ref/v)**4*np.log(v/v_ref)
     else:
-        raise ValueError("Cross sections only defined for interactions: 'SI', 'SD'...")
+        raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', 'Millicharge'...")
     
     return sigma_p*(1.0/(m_X*m_A))*C*(mu_A**4/mu_p**2)
     
@@ -346,12 +389,12 @@ def dv_by_dD(v, D, params):
     for i in isovals:
         #Only include a relevant form factor correction for spin-independent interactions
         #If another interaction is added which needs a form factor, add the correction here!
-        if (interaction == "SI"):
+        if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
         
-        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i], interaction)*FF_correction
+        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i], Zvals[i], v, interaction)*FF_correction
     return -1e2*v*res #(km/s)/m
 
 def dv_by_dD_concrete(v, D, params):
@@ -366,12 +409,12 @@ def dv_by_dD_concrete(v, D, params):
     #Loop over the relevant isotopes                              
     for i in isovals:
         #print(i, dens_interp(i, r))
-        if (interaction == "SI"):
+        if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
         
-        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i], interaction)*FF_correction
+        res += dens_interp(i, r)*effectiveXS(sigma_p, m_x, Avals[i], Zvals[i], v, interaction)*FF_correction
     return -1e2*v*res #(km/s)/m   
 
 #Derivative for the case of Pb shielding
@@ -379,15 +422,17 @@ def dv_by_dD_Pb(v, D, params):
     #Pb density
     n_Pb = 3.3e22
     A_Pb = 207
+    Z_Pb = 82
         
     sigma_p, m_x, interaction = params
     
-    if (interaction == "SI"):
+    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
         FF_correction = corr_Pb(v)
     else:
         FF_correction = 1.0
+
         
-    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb, interaction)*FF_correction
+    res = n_Pb*effectiveXS(sigma_p, m_x, A_Pb, Z_Pb, v, interaction)*FF_correction
     return -1e2*v*res #(km/s)/m
     
 #Derivative for the case of Cu shielding
@@ -395,15 +440,16 @@ def dv_by_dD_Cu(v, D, params):
     #Cu density
     n_Cu = 8.5e22
     A_Cu = 63.5
+    Z_Cu = 29
         
     sigma_p, m_x, interaction = params
     
-    if (interaction == "SI"):
+    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
         FF_correction = corr_Cu(v)
     else:
         FF_correction = 1.0
     
-    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu, interaction)*FF_correction
+    res = n_Cu*effectiveXS(sigma_p, m_x, A_Cu, Z_Cu, v, interaction)*FF_correction
     return -1e2*v*res #(km/s)/m
 
 #Derivative for the case of Fe shielding  
@@ -412,14 +458,15 @@ def dv_by_dD_Fe(v, D, params):
     #n_Fe = 7.874 #g/cm^3
     n_Fe = 8.5e22
     A_Fe = 55.85
+    Z_Fe = 26
 
     sigma_p, m_x, interaction = params
-    if (interaction == "SI"):
+    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
         FF_correction = corr_Fe(v)
     else:
         FF_correction = 1.0
     
-    res = n_Fe*effectiveXS(sigma_p, m_x, A_Fe, interaction)*FF_correction
+    res = n_Fe*effectiveXS(sigma_p, m_x, A_Fe, Z_Fe, v, interaction)*FF_correction
     return -1e2*v*res #(km/s)/m  
 
 

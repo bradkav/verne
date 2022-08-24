@@ -28,7 +28,9 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 
 ### Getting started
 
-The best place to start is probably the [example notebook](/src/Example.ipynb). 
+The best place to start is probably the [example notebook](/src/Example.ipynb). You can also find more detailed info in the README file for the [`src/`](src/) folder. I'm also very happy to provide more specific examples if you have something in particular in mind - just get in touch. 
+
+Note that the [`millichargedDM` branch](https://github.com/bradkav/verne/blob/millichargedDM) of the repo is probably a little more up-to-date with examples (as well as including code for simulating millicharged DM scattering in the Earth). So it might be worth taking a look at the example notebook [there](https://github.com/bradkav/verne/blob/millichargedDM/src/Example.ipynb) for more inspiration.
 
 ### Dependencies
 

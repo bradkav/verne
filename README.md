@@ -26,6 +26,10 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 - `plots`: Plots and illustrations summarising the key results. Mostly from [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).  
 - `paper`: PDF and tex files for the associated paper.
 
+### Getting started
+
+The best place to start is probably the [example notebook](/src/Example.ipynb). 
+
 ### Dependencies
 
 The code is compatible with Python3. Requires [numpy](http://www.numpy.org) and [scipy](https://www.scipy.org). More detailed dependencies can be found in `requirements.txt`.

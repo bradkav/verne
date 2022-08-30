@@ -12,6 +12,7 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 
 ### Version history
 
+**Version 1.3 (30/08/2022):** Major update to include millicharged DM interactions. 
 **Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.  
 **Version 1.1 (12/02/2018):** Updated event rate calculation to account for correct CRESST exposure times. Minor edits to text.  
 **Version 1.0 (14/12/2017):** Initial release (including arXiv numbers, etc.)  
@@ -29,8 +30,6 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 ### Getting started
 
 The best place to start is probably the [example notebook](/src/Example.ipynb). You can also find more detailed info in the README file for the [`src/`](src/) folder. I'm also very happy to provide more specific examples if you have something in particular in mind - just get in touch. 
-
-Note that the [`millichargedDM` branch](https://github.com/bradkav/verne/blob/millichargedDM) of the repo is probably a little more up-to-date with examples (as well as including code for simulating millicharged DM scattering in the Earth). So it might be worth taking a look at the example notebook [there](https://github.com/bradkav/verne/blob/millichargedDM/src/Example.ipynb) for more inspiration.
 
 ### Dependencies
 

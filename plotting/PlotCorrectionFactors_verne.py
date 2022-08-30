@@ -51,7 +51,7 @@ for key in verne.isoID:
     if ("_A" not in key):
         iso = verne.isoID[key]
     
-        print(key, iso)
+        #print(key, iso)
         C_vals = verne.corr_interp[iso](v_vals)
         #print(C_vals)
         plt.plot(v_vals, C_vals, label=key, color = "C" + str(iso))
@@ -62,7 +62,7 @@ for key in verne.isoID:
         x_s = (verne.q_screen/q_max)**2
         
         v_min = 3e5*verne.q_screen/(2*mu_A)
-        print(v_min)
+        #print(v_min)
         
         #plt.plot(v_vals, np.log(1/x_s), color = "C" + str(iso), linestyle='--')
         

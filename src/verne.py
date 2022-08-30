@@ -55,7 +55,7 @@ corr_Fe = None
 #Note that Form Factors are only implemented for spin-independent interactions at the moment
 NEGLECT_FF = False
 if (NEGLECT_FF == True):
-    print("verne.py: Neglecting form factors...")
+    print("> verne.py: Neglecting form factors...")
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
@@ -77,7 +77,7 @@ NSTEP = 200
 
 
 def loadIsotopes():
-    print(">VERNE: Loading isotope data and density profiles...")
+    print("> VERNE: Loading isotope data and density profiles...")
     
     global dens_profiles
     global isotopes
@@ -154,7 +154,7 @@ def loadFFcorrections(m_x, interaction = "SI"):
     if (Avals is None):
         loadIsotopes()
     
-    print(">VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV, with " + interaction + " interactions...")
+    print("> VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV, with " + interaction + " interactions...")
     corr_interp = [calcFFcorrection(m_x, Avals[ID], interaction) for ID in range(Niso_full)]
     #Also need Lead + Copper, for the shielding
     corr_Pb = calcFFcorrection(m_x, 207, interaction) 
@@ -283,7 +283,6 @@ def calcFFcorrection(m_x, A0, interaction = "SI"):
     if (interaction.lower() == "SI".lower()):
         corr_fact[0] = 1.0
     elif (interaction.lower() == "Millicharge".lower()):
-        print("DEBUG: Be careful here, I think this should be 1.0, rather than 0.0...")
         corr_fact[0] = 0.0
         
     
@@ -313,11 +312,10 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
         else:
             C = 0.0
     elif (interaction.lower() == "Millicharge".lower()):
-        v_ref = 3e5*alpha*m_e/(2*mu_A)
-        if (v < v_ref):
+        v_s = 3e5*alpha*m_e/(2*mu_A) #Screening velocity
+        if (v < v_s):
             return 0.0
-        print("DEBUG: Be careful here, I may be out by a factor of sqrt(2) or 2 with v_ref...")
-        C = Z**2*(2*v_ref/v)**4*np.log(v/v_ref)
+        C = Z**2*(2*v_s/v)**4*np.log(v/v_s)
     else:
         raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', 'Millicharge'...")
     

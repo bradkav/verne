@@ -53,7 +53,9 @@ corr_Cu = None
 corr_Fe = None
 
 #Note that Form Factors are only implemented for spin-independent interactions at the moment
-NEGLECT_FF = True
+NEGLECT_FF = False
+if (NEGLECT_FF == True):
+    print("verne.py: Neglecting form factors...")
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
@@ -281,6 +283,7 @@ def calcFFcorrection(m_x, A0, interaction = "SI"):
     if (interaction.lower() == "SI".lower()):
         corr_fact[0] = 1.0
     elif (interaction.lower() == "Millicharge".lower()):
+        print("DEBUG: Be careful here, I think this should be 1.0, rather than 0.0...")
         corr_fact[0] = 0.0
         
     
@@ -313,6 +316,7 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
         v_ref = 3e5*alpha*m_e/(2*mu_A)
         if (v < v_ref):
             return 0.0
+        print("DEBUG: Be careful here, I may be out by a factor of sqrt(2) or 2 with v_ref...")
         C = Z**2*(2*v_ref/v)**4*np.log(v/v_ref)
     else:
         raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', 'Millicharge'...")

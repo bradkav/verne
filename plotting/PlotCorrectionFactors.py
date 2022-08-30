@@ -40,14 +40,14 @@ v_vals = np.linspace(0.1, 800, 100)
 
 #Calculating correction factors...
 
-print " Calculating for Silicon..."
+print(">Calculating for Silicon...")
 sig_corr_Si = v_vals*0.0
 ER_corr_Si = v_vals*0.0
 for i, v in enumerate(v_vals):
     sig_corr_Si[i] = quad(lambda x: verne.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*28, v), 28), 0, 1)[0]
     ER_corr_Si[i] = quad(lambda x: 2.0*x*verne.calcSIFormFactor(x*(1e6/(3e5*3e5))*ERmax(m_x, 0.9315*28, v), 28), 0, 1)[0]
 
-print " Calculating for Oxygen..."
+print(">Calculating for Oxygen...")
 sig_corr_Pb = v_vals*0.0
 ER_corr_Pb = v_vals*0.0
 for i, v in enumerate(v_vals):
@@ -78,6 +78,6 @@ ax2.axhline(1.0, color='k', linestyle=':')
 ax2.legend(loc='best', frameon=False)
 
 #f.subplots_adjust(hspace=0.1)
-pl.savefig("../plots/CorrectionFactors.pdf", bbox_inches="tight")
+#pl.savefig("../plots/CorrectionFactors.pdf", bbox_inches="tight")
 
 pl.show()

@@ -12,7 +12,7 @@ except:
     def tqdm(x):
         return x
 
-def calcVelDist_full(m_x, sigma_p, loc, interaction):
+def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
     results_dir = "results/"
 
@@ -33,6 +33,8 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction):
         depth = 0.0 #metres
     elif (loc == "MOD"):
         depth = 1700.0
+    elif (loc == "full"):
+        depth = depth_in
     
     target = loc
 
@@ -56,7 +58,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction):
     v_e = np.sqrt(2.0)*MB.sigmav
     vesc = MB.vesc
     
-    v_th = 1e0 #Lowest speed to consider (don't go lower than v_th km/s, other the calculation of derivatives is messed up...)  
+    v_th = 20e0 #Lowest speed to consider (don't go lower than v_th km/s, other the calculation of derivatives is messed up...)  
     
     def getVelDist(gamma):
         
@@ -102,7 +104,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction):
         
         
     #Loop over gamma values
-    N_gamma = 11
+    N_gamma = 25
     Nv1 = 20 #Near the velocity threshold
     Nv2 = 40 #Everywhere else
     Nv = Nv1 + Nv2 + 1 + 1 #Add an extra one for 20 km/s

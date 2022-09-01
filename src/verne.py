@@ -53,7 +53,7 @@ corr_Cu = None
 corr_Fe = None
 
 #Note that Form Factors are only implemented for spin-independent interactions at the moment
-NEGLECT_FF = False
+NEGLECT_FF = True
 if (NEGLECT_FF == True):
     print("> verne.py: Neglecting form factors...")
 

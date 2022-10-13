@@ -5,6 +5,7 @@ import MaxwellBoltzmann as MB
 import argparse
 
 import verne as verne
+from matplotlib import pyplot as plt
 
 try:
     from tqdm import tqdm
@@ -17,12 +18,10 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     results_dir = "results/"
 
 
-    if (interaction not in  ["SI", "SD"]):
+    if (interaction not in  ["SI", "SD", "hDP", "Millicharge"]):
         print(">Unknown interaction type <", interaction, ">...")
         exit()
-
-
-
+        
     if (loc == "SUF"):
         depth = 10.6 #metres
     elif (loc == "MPI"):
@@ -90,7 +89,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         vlist = np.logspace(np.log10(v_th), np.log10(0.25*vmax), Nv1)    #20
         vlist = np.append(vlist, np.linspace(0.15*vmax, 0.999*vmax, Nv2)) #40
         vlist = np.append(vlist, 19.9)
-        #vlist = np.linspace(v_th, 0.999*vmax, 50)
+        vlist = np.linspace(v_th, 0.9999999*vmax, 50)
         vlist = np.sort(vlist)
         f_final = 0.0*vlist
         for i in tqdm(range(len(vlist))):
@@ -106,7 +105,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     #Loop over gamma values
     N_gamma = 25
     Nv1 = 20 #Near the velocity threshold
-    Nv2 = 40 #Everywhere else
+    Nv2 = 78 #Everywhere else
     Nv = Nv1 + Nv2 + 1 + 1 #Add an extra one for 20 km/s
     gamma_list = np.linspace(0, 1.0, N_gamma)
     vgrid = np.zeros((N_gamma, Nv))

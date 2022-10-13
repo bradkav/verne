@@ -2,7 +2,7 @@
 verne.py - Code for calculating the Earth stopping effect, primarily for heavy Dark Matter.
 
 
-Last updated: 13/12/2017
+Last updated: 13/10/2022
 Contact: Bradley Kavanagh, bradkav@gmail.com
 
 """
@@ -242,9 +242,9 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
-
+print("Add hDP...")
 def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
-    if (interaction.lower() == "SI".lower()):
+    if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
         return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
         
     elif (interaction.lower() == "Millicharge".lower()):
@@ -280,7 +280,7 @@ def calcFFcorrection(m_x, A0, interaction = "SI"):
         else:
             corr_fact[i] = 0.0
             
-    if (interaction.lower() == "SI".lower()):
+    if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
         corr_fact[0] = 1.0
     elif (interaction.lower() == "Millicharge".lower()):
         corr_fact[0] = 0.0
@@ -301,6 +301,9 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
     #C is 'interaction enhancement' factor
     if (interaction.lower() == "SI".lower()):
         C = A**2
+        
+    elif (interaction.lower() == "hDP".lower()):
+        C = Z**2 
         
     elif (interaction.lower() == "SD".lower()):
         #Include SD only for nitrogen - valid for coupling purely to protons OR neutrons only
@@ -391,7 +394,7 @@ def dv_by_dD(v, D, params):
     for i in isovals:
         #Only include a relevant form factor correction for spin-independent interactions
         #If another interaction is added which needs a form factor, add the correction here!
-        if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
+        if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -411,7 +414,7 @@ def dv_by_dD_concrete(v, D, params):
     #Loop over the relevant isotopes                              
     for i in isovals:
         #print(i, dens_interp(i, r))
-        if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
+        if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -428,7 +431,7 @@ def dv_by_dD_Pb(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
         FF_correction = corr_Pb(v)
     else:
         FF_correction = 1.0
@@ -446,7 +449,7 @@ def dv_by_dD_Cu(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
         FF_correction = corr_Cu(v)
     else:
         FF_correction = 1.0
@@ -463,7 +466,7 @@ def dv_by_dD_Fe(v, D, params):
     Z_Fe = 26
 
     sigma_p, m_x, interaction = params
-    if (interaction.lower() in ["SI".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
         FF_correction = corr_Fe(v)
     else:
         FF_correction = 1.0

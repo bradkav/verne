@@ -2,7 +2,7 @@
 verne.py - Code for calculating the Earth stopping effect, primarily for heavy Dark Matter.
 
 
-Last updated: 13/12/2017
+Last updated: 13/10/2022
 Contact: Bradley Kavanagh, bradkav@gmail.com
 
 """

@@ -12,6 +12,7 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 
 ### Version history
 
+**Version 1.3.1 (13/10/2022):** Minor update to include interactions mediated by a heavy Dark Photon.  
 **Version 1.3 (30/08/2022):** Major update to include millicharged DM interactions.  
 **Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.  
 **Version 1.1 (12/02/2018):** Updated event rate calculation to account for correct CRESST exposure times. Minor edits to text.  
@@ -51,7 +52,8 @@ as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1
 ### Papers
 
 The `verne` code has been used (in some form or another) in the follow research papers:
-- *Search for sub-GeV Dark Matter via Migdal effect with an EDELWEISS germanium detector with NbSi TES sensors*, EDELWEISS Collaboration & B. J. Kavanagh (2022), [arXiv:2203.03993](https://arxiv.org/abs/2203.03993)
+- *Search for sub-GeV Dark Matter via Migdal effect with an EDELWEISS germanium detector with NbSi TES sensors*, EDELWEISS Collaboration & B. J. Kavanagh (2022), [arXiv:2203.03993](https://arxiv.org/abs/2203.03993)  
+- *Searching for low-mass dark matter via Migdal effect in COSINE-100*, Adhikari et al., [arXiv:2110.05806](https://arxiv.org/abs/2110.05806)  
 - *Etching Plastic Searches for Dark Matter*, A. Bhoonah, J. Bramante, B. Courtman & N. Song (2020), [arXiv:2012.13406](https://arxiv.org/abs/2012.13406)  
 - *Detecting Composite Dark Matter with Long Range and Contact Interactions in Gas Clouds*, A. Bhoonah, J. Bramante, S. Schon & N. Song (2020), [arXiv:2010.07240](https://arxiv.org/abs/2010.07240)  
 - *Light Dark Matter Search with a High-Resolution Athermal Phonon Detector Operated Above Ground*, Alkhatib et al (SuperCDMS Collaboration, 2020), [arXiv:2007.14289](https://arxiv.org/abs/2007.14289)

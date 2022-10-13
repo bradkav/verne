@@ -5,6 +5,7 @@ import MaxwellBoltzmann as MB
 import argparse
 
 import verne as verne
+from matplotlib import pyplot as plt
 
 try:
     from tqdm import tqdm
@@ -27,9 +28,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     if (interaction not in  ["SI", "SD", "Millicharge", "hDP"]):
         print(">Unknown interaction type <", interaction, ">...")
         exit()
-
-
-
+        
     if (loc == "SUF"):
         depth = 10.6 #metres
     elif (loc == "MPI"):
@@ -121,8 +120,8 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         #Tabulate values of speed distribution
     
         #Generate a list of sampling values for v (with some very close to v_th)
-        vlist = np.geomspace(v_th, 0.25*vmax, Nv1)    #20
-        vlist = np.append(vlist, np.linspace(0.15*vmax, 0.6*vmax, Nv2)) #40
+        vlist = np.geomspace(v_th, 0.25*vmax, Nv1)    
+        vlist = np.append(vlist, np.linspace(0.15*vmax, 0.6*vmax, Nv2)) 
         vlist = np.append(vlist, np.linspace(0.61*vmax, 0.9999*vmax, Nv3)) 
         vlist = np.append(vlist, 0.99*v_th)
         #vlist = np.linspace(v_th, 0.999*vmax, 50)
@@ -149,6 +148,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     gamma_list = np.linspace(0, 1, N_gamma)
     gamma_list[0] = 1e-3
     gamma_list[-1] = 1 - 1e-3
+
     vgrid = np.zeros((N_gamma, Nv))
     fgrid = np.zeros((N_gamma, Nv))
     fgrid_withrefl = np.zeros((N_gamma, Nv))

@@ -52,7 +52,7 @@ def loadPhiInterp():
 loadPhiInterp()
 
 def IntegralOverPhi(x, phi_max):
-    if (phi_max < 0):
+    if (phi_max <= 0):
         return 0
     if (phi_max >= np.pi):
         return 2.0*np.pi*scipy.special.i0(x)
@@ -67,13 +67,13 @@ IntegralOverPhiVec = np.vectorize(IntegralOverPhi)
 def calcf_integ(v, theta, gamma):
     
     if (v*np.sin(gamma)*np.sin(theta) <= 1e-10):
+        #print(v, gamma, theta)
         return 2.0*np.pi*VelDist(v, theta, 0, gamma)
     
     delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta)
     
     cosmin = (v**2 + ve**2 - vesc**2)/(2*v*ve*np.sin(gamma)*np.sin(theta))\
          - (np.cos(gamma)*np.cos(theta))/(np.sin(gamma)*np.sin(theta))
-    
     
     x0 = np.sin(theta)*np.sin(gamma)*v*ve/(sigmav**2)
     phi_max = np.arccos(np.clip(cosmin, -1.0, 1.0))

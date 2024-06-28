@@ -69,8 +69,8 @@ q_screen = alpha*m_e #Electron screening momentum in GeV
 #--------------------
 #Integration parameters
 
-TOL = 1e-5
-NSTEP = 200
+TOL = 1e-2
+NSTEP = 100
 
 
 #--------------------
@@ -242,7 +242,7 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
-print("Add hDP...")
+
 def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
     if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
         return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
@@ -331,9 +331,9 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp, interaction="SI"):
     
     #Define a grid of values for theta which we sample over
     #theta = pi/2 is often problematic, so we sample more densely there
-    tlist = np.linspace(0, np.pi, 101)
-    tlist = np.append(tlist, (np.pi/2)*(1 + np.logspace(-3, -0.01, 50)))
-    tlist = np.append(tlist, (np.pi/2)*(1 - np.logspace(-3, -0.01, 50)))
+    tlist = np.linspace(0, np.pi, 51)
+    tlist = np.append(tlist, (np.pi/2)*(1 + np.logspace(-3, -0.01, 20)))
+    tlist = np.append(tlist, (np.pi/2)*(1 - np.logspace(-3, -0.01, 20)))
     tlist = np.sort(tlist)
     
     fint = tlist*0.0
@@ -363,8 +363,8 @@ def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, interaction, target)
     dvi_by_dvf = np.abs(vi1 - vi2)*1.0/dv
     #vi = (vi1 + vi2 + vi3 + vi4)/4.0
     #dvi_by_dvf = np.abs(-vi4 + 8*vi3 - 8*vi2 + vi1)*1.0/(6*dv)
-    
-    return (dvi_by_dvf)*np.sin(theta)*(vi**2)*MB.calcf_integ(vi, theta, gamma)
+    #print(len(vi))
+    return (dvi_by_dvf)*np.sin(theta)*(vi**2)*MB.calcf_integ(float(vi), theta, gamma)
  
 #Calculate the distance of a point from the centre of the Earth
 #The point is defined by:

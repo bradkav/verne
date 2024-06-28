@@ -81,7 +81,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
     #Initialise verne
     verne.loadIsotopes()
-    verne.loadFFcorrections(m_x)
+    verne.loadFFcorrections(m_x, interaction)
     
     #Calculate the maximum initial speed as a function of incoming angle theta
     Nvals = 501
@@ -140,7 +140,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         
         
     #Loop over gamma values
-    N_gamma = 25
+    N_gamma = 3
     Nv1 = 20 #Near the velocity threshold
     Nv2 = 30 #Everywhere else
     Nv3 = 48
@@ -170,4 +170,5 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         np.savetxt(fname, outdata, header=headertxt)
     except:
         np.savetxt("../" + fname, outdata, header=headertxt)
+
     

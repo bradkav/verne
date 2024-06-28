@@ -49,9 +49,6 @@ for i, v in enumerate(v_initial):
     v_final_lab3[i] = verne.calcVfinal(v_final_atmos[i], theta,  depth*0.96, sigma_p, m_x, target="earth")
     v_final_full[i] = verne.calcVfinal_shield_SUF(v_final_lab[i], sigma_p, m_x)
     
-    
-print v_final_lab2/v_final_lab
-print v_final_lab3/v_final_lab
 
 pl.figure()
 pl.plot(v_initial, v_final_atmos,color='DarkBlue', linewidth=1.5, label='Atmos')

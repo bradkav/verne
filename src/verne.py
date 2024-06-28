@@ -36,6 +36,16 @@ def odeint_new(f, v0, t_span , args, mxstep, rtol):
 #Distances in m
 #--------------------
 
+
+#-------------------------------------------------------------------------------------------
+#Note that Form Factors are only implemented for spin-independent interactions at the moment
+NEGLECT_FF = False
+
+if (NEGLECT_FF == True):
+    print("> verne.py: Neglecting form factors...")
+#-------------------------------------------------------------------------------------------
+
+
 isotopes = None
 dens_profiles = None
 dens_interp = None
@@ -52,10 +62,6 @@ corr_Pb = None
 corr_Cu = None
 corr_Fe = None
 
-#Note that Form Factors are only implemented for spin-independent interactions at the moment
-NEGLECT_FF = True
-if (NEGLECT_FF == True):
-    print("> verne.py: Neglecting form factors...")
 
 isoID = {"O":0, "Si":1, "Mg":2, "Fe":3, "Ca":4, "Na":5, "S":6, "Al":7, "O_A":8, "N_A": 9}
 
@@ -242,7 +248,6 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
-print("Add hDP...")
 def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
     if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
         return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
@@ -557,26 +562,26 @@ def calcVinitial_full(vf, theta,  depth, sigma_p, m_x, interaction="SI", target=
 # Individual function for specifying propagation through shielding at different experiments/sites
     
 #Calculate final (or initial) speed after crossing the Lead shielding at SUF
-def calcVfinal_shield_SUF(v0, sigma_p, m_x, interaction):
+def calcVfinal_shield_SUF(v0, sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 16cm of Lead
     psoln = odeint(dv_by_dD_Pb, v0, [0,16.0e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
-def calcVinitial_shield_SUF(v0,  sigma_p, m_x, interaction):
+def calcVinitial_shield_SUF(v0,  sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 16cm of Lead (backwards)
     psoln = odeint(dv_by_dD_Pb, v0, [16.0e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
     
-def calcVfinal_shield_MOD(v0, sigma_p, m_x, interaction):
+def calcVfinal_shield_MOD(v0, sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 20cm of Lead
     psoln = odeint(dv_by_dD_Pb, v0, [0,20.0e-2] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
-def calcVinitial_shield_MOD(v0,  sigma_p, m_x, interaction):
+def calcVinitial_shield_MOD(v0,  sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 20cm of Lead (backwards)
     psoln = odeint(dv_by_dD_Pb, v0, [20.0e-2,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
@@ -585,13 +590,13 @@ def calcVinitial_shield_MOD(v0,  sigma_p, m_x, interaction):
 
 
 #Calculate final (or initial) speed after crossing the Copper shielding at MPI
-def calcVfinal_shield_MPI(v0, sigma_p, m_x, interaction):
+def calcVfinal_shield_MPI(v0, sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 1mm Copper
     psoln = odeint(dv_by_dD_Cu, v0, [0,1e-3] , args=(params,), mxstep=NSTEP, rtol=TOL)
     return psoln[1]
     
-def calcVinitial_shield_MPI(v0, sigma_p, m_x, interaction):
+def calcVinitial_shield_MPI(v0, sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
     #Propagate through 1mm Copper
     psoln = odeint(dv_by_dD_Cu, v0, [1e-3,0] , args=(params,), mxstep=NSTEP, rtol=TOL)
@@ -609,7 +614,7 @@ a_lead = np.pi - np.arctan(0.234/(0.83 - hdet))
 a_steel = np.pi - np.arctan(0.215/(1.5-hdet))
 
 #Calculate final (or initial) speed after crossing the Lead shielding at EDE...
-def calcVfinal_shield_EDE(v0, theta, sigma_p, m_x, interaction):
+def calcVfinal_shield_EDE(v0, theta, sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
 
     #Walls of the room                                                                                                                                       
@@ -644,7 +649,7 @@ def calcVfinal_shield_EDE(v0, theta, sigma_p, m_x, interaction):
 
     return v1
     
-def calcVinitial_shield_EDE(v0, theta,  sigma_p, m_x, interaction):
+def calcVinitial_shield_EDE(v0, theta,  sigma_p, m_x, interaction="SI"):
     params = [sigma_p, m_x, interaction]
  
     #Copper elements                                                                                                                                         

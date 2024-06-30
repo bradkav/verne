@@ -38,7 +38,8 @@ def getVelDist(lsigstr, gamma_ind):
     
     rowvals = gamma_ind*61, 
 
-    gamma_vals1, vvals1, fvals1 = np.loadtxt("../results/veldists/f_SUF_lmx5.0_lsig" + lsigstr + ".txt", unpack=True)
+    #gamma_vals1, vvals1, fvals1 = np.loadtxt("../results/veldists/f_SUF_lmx5.0_lsig" + lsigstr + ".txt", unpack=True)
+    gamma_vals1, vvals1, fvals1 = np.loadtxt("../results/veldists/f_SI_full_mx100000.000_lsig" + lsigstr + ".txt", unpack=True)
     vvals = vvals1[gamma_ind*61:(gamma_ind+1)*61]
     fvals = fvals1[gamma_ind*61:(gamma_ind+1)*61]
     return vvals, fvals

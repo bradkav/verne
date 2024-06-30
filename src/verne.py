@@ -74,11 +74,8 @@ q_screen = alpha*m_e #Electron screening momentum in GeV
 
 #--------------------
 #Integration parameters
-
 TOL = 1e-5
 NSTEP = 200
-
-
 #--------------------
 
 

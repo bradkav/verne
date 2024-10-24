@@ -13,19 +13,13 @@ except:
     def tqdm(x):
         return x
 
-d_list, p_list = np.loadtxt("data/p_reflected.txt", unpack=True)
-p_interp = interp1d(d_list, p_list, bounds_error=False, fill_value=(0, 1))
-
-
-
-
 def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
 
     results_dir = "results/"
 
 
-    if (interaction not in  ["SI", "SD", "Millicharge", "hDP"]):
+    if (interaction not in  ["SI", "SD"]):
         print(">Unknown interaction type <", interaction, ">...")
         exit()
         
@@ -43,33 +37,6 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         depth = depth_in
     
     target = loc
-
-    def p_return_full(theta, sigma):
-        mp = 0.92
-        mA = 16*mp
-        coherent = (mA/mp)**4*(m_x + mp)**2/(m_x + mA)**2
-
-        n_E = 3e22 #cm^-3
-    
-        lam = 1/(coherent*sigma_p*n_E)
-        d = 1e2*verne.pathLength_Earth(depth, np.pi - theta)
-        return p_interp(d/lam)
-
-    def calc_frac(sigma, gamma): 
-
-        Nv = 100
-    
-        vs = np.linspace(1e-3, 800, Nv)
-        thetas = np.linspace(0, np.pi, 25)
-        vals = np.zeros(Nv)
-
-        for i in tqdm(range(Nv)):
-            integs = p_return_full(thetas, sigma)*vs[i]**2*np.sin(thetas)*np.vectorize(MB.calcf_integ)(vs[i], thetas, gamma=gamma)
-            vals[i] = np.trapz(integs, thetas)
-
-        frac = np.trapz(vals, vs)
-        return frac    
-
 
     print(" ")
     print(">Calculating for...")
@@ -134,9 +101,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         vlist = np.append(vlist, vmax)
         f_final = np.append(f_final, 0.0)
     
-        frac_reflected = calc_frac(sigma_p, gamma)
-
-        return vlist, f_final, f_final*(1 + frac_reflected)
+        return vlist, f_final
         
         
     #Loop over gamma values
@@ -154,18 +119,18 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     fgrid_withrefl = np.zeros((N_gamma, Nv))
     for j in range(N_gamma):
         print(">Calculating for gamma/pi = ", gamma_list[j],"...")
-        vgrid[j,:], fgrid[j,:], fgrid_withrefl[j,:] = getVelDist(gamma_list[j]*np.pi)
+        vgrid[j,:], fgrid[j,:] = getVelDist(gamma_list[j]*np.pi)
     
     gamma_rep = np.repeat(gamma_list, Nv)
     
     #Output to file
     fname = results_dir + "veldists/f_" + interaction + "_" + loc + "_mx" + '{0:.3f}'.format(m_x) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
     headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\nloc: " + target
-    headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km], f[with reflection](v, gamma) [s/km]"
+    headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
     
     #Try different locations to save files, depending on where
     #the code is being executed from
-    outdata = np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten(), fgrid_withrefl.flatten()])
+    outdata = np.transpose([gamma_rep, vgrid.flatten(), fgrid.flatten()])
     try:
         np.savetxt(fname, outdata, header=headertxt)
     except:

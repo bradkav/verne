@@ -106,7 +106,8 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         
         
     #Loop over gamma values
-    N_gamma = 11
+    N_gamma = 21
+    
     Nv1 = 20 #Near the velocity threshold
     Nv2 = 15 #Everywhere else
     Nv3 = 24

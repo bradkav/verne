@@ -59,25 +59,63 @@ def IntegralOverPhi(x, phi_max):
     else: 
         return 2.0*phi_interp(x, phi_max)
 
-IntegralOverPhiVec = np.vectorize(IntegralOverPhi)
+IntegralOverPhiVec_old = np.vectorize(IntegralOverPhi)
+
+def IntegralOverPhiVec(x, phi_max):
+    if hasattr(phi_max, "__len__"):
+        result = np.zeros(len(phi_max))
+        inds = phi_max >= np.pi
+        print(inds)
+        print(inds.shape)
+        result[inds] = 2.0*np.pi*scipy.special.i0(x[inds])
+        
+        inds = (0 <= phi_max)  & (phi_max <= np.pi)
+        result[inds] = 2.0*np.diagonal(phi_interp(x, phi_max))[inds]
+        return result
+    else:
+        return IntegralOverPhi(x, phi_max)
+
 
 #Integrand for integrating over the velocity distribution
 #The phi integral has already been performed, so all you have
 #left is v and theta.
 def calcf_integ(v, theta, gamma):
-    
-    if (v*np.sin(gamma)*np.sin(theta) <= 1e-10):
-        #print(v, gamma, theta)
-        return 2.0*np.pi*VelDist(v, theta, 0, gamma)
-    
-    delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta)
-    
-    cosmin = (v**2 + ve**2 - vesc**2)/(2*v*ve*np.sin(gamma)*np.sin(theta))\
-         - (np.cos(gamma)*np.cos(theta))/(np.sin(gamma)*np.sin(theta))
-    
-    x0 = np.sin(theta)*np.sin(gamma)*v*ve/(sigmav**2)
-    phi_max = np.arccos(np.clip(cosmin, -1.0, 1.0))
-    A = IntegralOverPhiVec(x0, phi_max)*np.exp(-delsq/(2.0*sigmav**2))
+    #print("Vectorizing!")
+    #This function is vectorized over `theta` but not over `v`
+    if (hasattr(v, "__len__")):
+        raise ValueError("Velocity v must be a scalar.")
+            
+    if (not hasattr(theta, "__len__")):
+        if (v*np.sin(gamma)*np.sin(theta) <= 1e-10):
+            #print(v, gamma, theta)
+            return 2.0*np.pi*VelDist(v, theta, 0, gamma)
+        else:
+        
+            delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta)
+
+            cosmin = (v**2 + ve**2 - vesc**2)/(2*v*ve*np.sin(gamma)*np.sin(theta))\
+                 - (np.cos(gamma)*np.cos(theta))/(np.sin(gamma)*np.sin(theta))
+
+            x0 = np.sin(theta)*np.sin(gamma)*v*ve/(sigmav**2)
+            phi_max = np.arccos(np.clip(cosmin, -1.0, 1.0))
+            A = IntegralOverPhiVec(x0, phi_max)*np.exp(-delsq/(2.0*sigmav**2))
+
+    else:
+        A = 0.0*theta
+
+        inds0 = v*np.sin(gamma)*np.sin(theta) <= 1e-10
+        A[inds0] = 2.0*np.pi*VelDist(v, theta[inds0], 0, gamma)
+        
+        inds = v*np.sin(gamma)*np.sin(theta) > 1e-10
+        
+        delsq = v**2 + ve**2 - 2*v*ve*np.cos(gamma)*np.cos(theta[inds])
+
+        cosmin = (v**2 + ve**2 - vesc**2)/(2*v*ve*np.sin(gamma)*np.sin(theta[inds]))\
+             - (np.cos(gamma)*np.cos(theta[inds]))/(np.sin(gamma)*np.sin(theta[inds]))
+
+        x0 = np.sin(theta[inds])*np.sin(gamma)*v*ve/(sigmav**2)
+        phi_max = np.arccos(np.clip(cosmin, -1.0, 1.0))
+        A[inds] = IntegralOverPhiVec(x0, phi_max)*np.exp(-delsq/(2.0*sigmav**2))
     
     return A*1.0/NNORM
     

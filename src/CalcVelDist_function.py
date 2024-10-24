@@ -20,7 +20,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     results_dir = "results/"
 
 
-    if (interaction not in  ["SI", "SD", "Millicharge", "hDP"]):
+    if (interaction not in  ["SI", "SD"]):
         print(">Unknown interaction type <", interaction, ">...")
         exit()
         
@@ -39,7 +39,6 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
     target = loc
 
-
     print(" ")
     print(">Calculating for...")
     print(">    m_x/GeV:", m_x)
@@ -50,7 +49,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
     #Initialise verne
     verne.loadIsotopes()
-    verne.loadFFcorrections(m_x)
+    verne.loadFFcorrections(m_x, interaction)
     
     #Calculate the maximum initial speed as a function of incoming angle theta
     Nvals = 501
@@ -103,8 +102,6 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         vlist = np.append(vlist, vmax)
         f_final = np.append(f_final, 0.0)
     
-        #frac_reflected = calc_frac(sigma_p, gamma)
-
         return vlist, f_final
         
         
@@ -140,4 +137,5 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         np.savetxt(fname, outdata, header=headertxt)
     except:
         np.savetxt("../" + fname, outdata, header=headertxt)
+
     

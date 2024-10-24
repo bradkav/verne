@@ -2,7 +2,7 @@
 verne.py - Code for calculating the Earth stopping effect, primarily for heavy Dark Matter.
 
 
-Last updated: 13/10/2022
+Last updated: 24/10/2024
 Contact: Bradley Kavanagh, bradkav@gmail.com
 
 """
@@ -21,10 +21,7 @@ import MaxwellBoltzmann as MB
 from scipy.integrate import solve_ivp
 
 def odeint_new(f, v0, t_span , args, mxstep, rtol):
-    #print(v0)
     result = solve_ivp(f, t_span, y0=np.atleast_1d(v0), args=args, rtol=rtol, method="RK23")
-    #print(result)
-    #print(result.y[0][-1])
     return [result.t[-1], result.y[0][-1]]
 
 
@@ -74,8 +71,10 @@ q_screen = alpha*m_e #Electron screening momentum in GeV
 
 #--------------------
 #Integration parameters
-TOL = 1e-5
-NSTEP = 200
+
+TOL = 1e-3
+NSTEP = 100
+
 #--------------------
 
 
@@ -245,17 +244,10 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
+
 def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
-    if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
+    if (interaction.lower() == "SI".lower()):
         return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
-        
-    elif (interaction.lower() == "Millicharge".lower()):
-        m_A = 0.9315*A0
-        mu_A = m_A*m_x/(m_A + m_x)
-        q_max = 2*mu_A*v/3e5
-        x_s = (q_screen/q_max)**2
-        return (1/np.log(1/x_s))*(1/x)*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
-        
     else:
         return 1.0
 
@@ -269,24 +261,14 @@ def calcFFcorrection(m_x, A0, interaction = "SI"):
     x_min = 0
     x_max = 1
     for i, v in enumerate(v_vals):
-        if (interaction.lower() == "Millicharge".lower()):
-            m_A = 0.9315*A0
-            mu_A = m_A*m_x/(m_A + m_x)
-            q_max = 2*mu_A*v/3e5
-            x_s = (q_screen/q_max)**2
-            x_min = x_s
-            x_max = 1
         
         if (x_min < x_max):
             corr_fact[i] = quad(lambda x: FFcorrection_integrand(x, v, m_x, A0, interaction), x_min, x_max)[0]
         else:
             corr_fact[i] = 0.0
             
-    if (interaction.lower() == "SI".lower() or interaction.lower() == "hDP".lower()):
+    if (interaction.lower() == "SI".lower()):
         corr_fact[0] = 1.0
-    elif (interaction.lower() == "Millicharge".lower()):
-        corr_fact[0] = 0.0
-        
     
     return interp1d(v_vals, corr_fact, kind='linear', bounds_error=False, fill_value=0.0)
 
@@ -304,9 +286,6 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
     if (interaction.lower() == "SI".lower()):
         C = A**2
         
-    elif (interaction.lower() == "hDP".lower()):
-        C = Z**2 
-        
     elif (interaction.lower() == "SD".lower()):
         #Include SD only for nitrogen - valid for coupling purely to protons OR neutrons only
         #Neglecting a subdominant contribution from Oxygen-17 in the atmosphere
@@ -316,13 +295,8 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
             C = (4./3.)*((J_N + 1)/J_N)*S**2
         else:
             C = 0.0
-    elif (interaction.lower() == "Millicharge".lower()):
-        v_s = 3e5*alpha*m_e/(2*mu_A) #Screening velocity
-        if (v < v_s):
-            return 0.0
-        C = Z**2*(2*v_s/v)**4*np.log(v/v_s)
     else:
-        raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', 'Millicharge'...")
+        raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', ...")
     
     return sigma_p*(1.0/(m_X*m_A))*C*(mu_A**4/mu_p**2)
     
@@ -333,9 +307,9 @@ def CalcF(vf, gamma, depth,sigma_p, m_x, target, vmax_interp, interaction="SI"):
     
     #Define a grid of values for theta which we sample over
     #theta = pi/2 is often problematic, so we sample more densely there
-    tlist = np.linspace(0, np.pi, 101)
-    tlist = np.append(tlist, (np.pi/2)*(1 + np.logspace(-3, -0.01, 50)))
-    tlist = np.append(tlist, (np.pi/2)*(1 - np.logspace(-3, -0.01, 50)))
+    tlist = np.linspace(0, np.pi, 51)
+    tlist = np.append(tlist, (np.pi/2)*(1 + np.logspace(-3, -0.01, 20)))
+    tlist = np.append(tlist, (np.pi/2)*(1 - np.logspace(-3, -0.01, 20)))
     tlist = np.sort(tlist)
     
     fint = tlist*0.0
@@ -363,10 +337,7 @@ def f_integrand_full(vf, theta, gamma, depth, sigma_p, m_x, interaction, target)
     #Calculate the average and the numerical derivative
     vi = (vi1 + vi2)/2.0
     dvi_by_dvf = np.abs(vi1 - vi2)*1.0/dv
-    #vi = (vi1 + vi2 + vi3 + vi4)/4.0
-    #dvi_by_dvf = np.abs(-vi4 + 8*vi3 - 8*vi2 + vi1)*1.0/(6*dv)
-    
-    return (dvi_by_dvf)*np.sin(theta)*(vi**2)*MB.calcf_integ(vi, theta, gamma)
+    return (dvi_by_dvf)*np.sin(theta)*(vi**2)*MB.calcf_integ(float(vi), theta, gamma)
  
 #Calculate the distance of a point from the centre of the Earth
 #The point is defined by:
@@ -396,7 +367,7 @@ def dv_by_dD(v, D, params):
     for i in isovals:
         #Only include a relevant form factor correction for spin-independent interactions
         #If another interaction is added which needs a form factor, add the correction here!
-        if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
+        if (interaction.lower() in ["SI".lower(),]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -416,7 +387,7 @@ def dv_by_dD_concrete(v, D, params):
     #Loop over the relevant isotopes                              
     for i in isovals:
         #print(i, dens_interp(i, r))
-        if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
+        if (interaction.lower() in ["SI".lower(),]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -433,7 +404,7 @@ def dv_by_dD_Pb(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(),]):
         FF_correction = corr_Pb(v)
     else:
         FF_correction = 1.0
@@ -451,7 +422,7 @@ def dv_by_dD_Cu(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(),]):
         FF_correction = corr_Cu(v)
     else:
         FF_correction = 1.0
@@ -468,7 +439,7 @@ def dv_by_dD_Fe(v, D, params):
     Z_Fe = 26
 
     sigma_p, m_x, interaction = params
-    if (interaction.lower() in ["SI".lower(), "hDP".lower(), "Millicharge".lower()]):
+    if (interaction.lower() in ["SI".lower(),]):
         FF_correction = corr_Fe(v)
     else:
         FF_correction = 1.0

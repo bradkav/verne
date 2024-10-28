@@ -2,22 +2,31 @@
 
 ## Usage
 
-The core code for calculations is in the module `verne.py`. Import in python with `import verne`.
+### Heavy Dark Matter
 
-
-### Initialisation
+The core of the standard code is in the module `verne.py`. Import in python with `import verne`.
 
 Then you need to do some initialisation:
-
-`verne.loadIsotopes()` - this loads the isotopes and density profiles for the Earth and atmosphere.
 
 `verne.loadFFcorrections(m_x)` - this tabulates the correction factors due to Nuclear form factors. It must be reloaded for each new DM mass you want to calculate for.
 
 Note that there is a hard-coded flag `NEGLECT_FF` which you can set to true to neglect corrections due to form factors (which should be valid for low-mass DM). 
 
+
+### Light Dark Matter
+
+For sub-GeV Dark Matter, the formalism is a little different. In that case, you should load the module `verne_light.py`.
+
+In this case, you should run:
+
+`verne_light.Tabulate_Column_Density(depth, target)` - where `depth` is the depth of the detector in metres and `target = "earth", "atmos" or "full"` depending on whether you want to include interaction with the Earth, Atmosphere or both. You should re-tabulate whenever you want to study detectors at a different depth.
+
+**Warning:** the `verne_light` module is only valid for use with a Standard Maxwell Boltzmann distribution (as defined in `MaxwellBoltzmann.py`). It should be fine to alter the parameters for the Earth velocity, escape velocity and velocity dispersion defined in that module, but the code may not work as expected if you attempt to implement a different form for the input velocity distribution. This is because the grids of `theta` defined internally in the code are defined assuming a Maxwell Boltzmann distribution.
+
+
 ### Scripts
 
-To calculate the speed distribution at a detector, for a range of values of gamma and v, use:
+For *heavy DM*, calculate the speed distribution at a detector, for a range of values of gamma and v, use:
 
 ```python
 python3 CalcVelDist.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION -int INTERACTION
@@ -26,9 +35,19 @@ where
    - `M_X` is the DM mass in GeV  
   - `SIGMA_P` is the DM-nucleon cross section in cm^2  
   - `LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
-  - `INTERACTION` is the type of the type of interaction, either "SI" (Spin-independent),  "SD" (spin-dependent), "hDP" (interactions mediated by a heavy Dark Photon) or "Millicharge" (Millicharged DM).
+  - `INTERACTION` is the type of the type of interaction, either "SI" (Spin-independent),  "SD" (spin-dependent)
 
 Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module. The script `CalcVelDist.py` is actually just a command-line wrapper for the function in `CalcVelDist_function.py`, which may be useful if you want to call this from another python script.
+
+For *light DM*, use:
+```python
+python3 CalcVelDist_light.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION -int INTERACTION
+```
+where in this case, the possible interactions are "SI" (spin-independent), "hm" (heavy dark photon mediator) and "ulm" (ultra-light dark photon mediator).
+
+It should be straightforward to dig into the internals of the `CalcVelDist_function.py` script to adjust the grid of gamma and v that you want to use.
+
+### Other examples
 
 A general example (which performs an example velocity distribution calculation and event rate calculation) can be run with:
 ```

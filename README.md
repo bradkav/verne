@@ -7,11 +7,13 @@ Verne is a python code for calculating the Earth-stopping effect for Dark Matter
 
 The code allows you to calculate the speed distribution (and DM signal rate) at detectors in the Earth's atmosphere, on the Earth's surface and at underground detector locations, such as MPI (the Max-Planck-Institute in Munich) and SUF (the Stanford Underground Facility). This can be done for a range of DM masses and cross sections (though the results will be most reliable for very heavy DM particles). This is because the code implements a 'continuous stopping' formalism, with DM particles travelling on straight-line trajectories. Further details about the physics behind the code can be found in [arXiv:1712.04901](https://arxiv.org/abs/1712.04901).
 
-The core of the code (the `verne` module) is in the [src](src) folder, head there for some details of how to use the code.
+As of Version 2.0, there is now an additional module `verne_light`, which implements the Earth-scattering of very light DM, in which energy losses are negligible, and particles travel on straight-line trajectories with the possibility of reflection. Full details of the formalism will be presented in an up-coming paper. 
 
+The core of the code (the `verne` and `verne_light` modules) is in the [src](src) folder, head there for some details of how to use the code.
 
 ### Version history
 
+**Version 2.0 (28/10/2024):** Major update to include support for light Dark Matter (see `verne_light.py`), as well as some restructing of the code. Dark-photon mediated interactions are currently only supported in `verne_light.py`.
 **Version 1.3.1 (13/10/2022):** Minor update to include interactions mediated by a heavy Dark Photon.  
 **Version 1.3 (30/08/2022):** Major update to include millicharged DM interactions.  
 **Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.  
@@ -30,7 +32,7 @@ The core of the code (the `verne` module) is in the [src](src) folder, head ther
 
 ### Getting started
 
-The best place to start is probably the [example notebook](/src/Example.ipynb). You can also find more detailed info in the README file for the [`src/`](src/) folder. I'm also very happy to provide more specific examples if you have something in particular in mind - just get in touch. 
+The best place to start is probably the [example notebook](/src/Examples.ipynb). You can also find more detailed info in the README file for the [`src/`](src/) folder. I'm also very happy to provide more specific examples if you have something in particular in mind - just get in touch. 
 
 ### Dependencies
 

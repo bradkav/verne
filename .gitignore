@@ -6,3 +6,4 @@ outputs/*
 SubmitVerne.sh.o*
 SubmitVerne.sh.e*
 \#*\#
+results/veldists/f_SI_MOD*

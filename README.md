@@ -45,7 +45,7 @@ Some code is included for calculating nuclear recoil spectra in direct detection
 
 If you make use of the code or the numerical results, please cite:
 
->Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:1802.005, available at https://github.com/bradkav/verne.
+>B. J. Kavanagh & A. Lantero-Barreda (2024), Verne [Code v2.0], Astrophysics Source Code Library, record [ascl:1802.005](https://ascl.net/1802.005), [DOI:10.5281/zenodo.14003447](https://doi.org/10.5281/zenodo.14003447), available at https://github.com/bradkav/verne.
 
 as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1712.04901):
 

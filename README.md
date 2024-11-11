@@ -1,4 +1,4 @@
-# Verne
+# Verne 2.0
 
 [![DOI](https://zenodo.org/badge/112917758.svg)](https://zenodo.org/badge/latestdoi/112917758) [![arXiv](https://img.shields.io/badge/arXiv-1712.04901-B31B1B.svg)](https://arxiv.org/abs/1712.04901) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
@@ -13,7 +13,7 @@ The core of the code (the `verne` and `verne_light` modules) is in the [src](src
 
 ### Version history
 
-**Version 2.0 (28/10/2024):** Major update to include support for light Dark Matter (see `verne_light.py`), as well as some restructing of the code. Dark-photon mediated interactions are currently only supported in `verne_light.py`.
+**Version 2.0 (28/10/2024):** Major update to include support for light Dark Matter (see `verne_light.py`), as well as some restructing of the code. Dark-photon mediated interactions are currently only supported in `verne_light.py`.  
 **Version 1.3.1 (13/10/2022):** Minor update to include interactions mediated by a heavy Dark Photon.  
 **Version 1.3 (30/08/2022):** Major update to include millicharged DM interactions.  
 **Version 1.2 (09/03/2021):** Major update to include spin-dependent interactions (and fix a few minor bugs). Now compatible with Python3.  
@@ -45,7 +45,7 @@ Some code is included for calculating nuclear recoil spectra in direct detection
 
 If you make use of the code or the numerical results, please cite:
 
->Kavanagh, B. J., 2016, Verne, Astrophysics Source Code Library, record ascl:1802.005, available at https://github.com/bradkav/verne.
+>B. J. Kavanagh & A. Lantero-Barreda (2024), Verne [Code v2.0], Astrophysics Source Code Library, record [ascl:1802.005](https://ascl.net/1802.005), [DOI:10.5281/zenodo.14003447](https://doi.org/10.5281/zenodo.14003447), available at https://github.com/bradkav/verne.
 
 as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1712.04901):
 

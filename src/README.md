@@ -45,7 +45,9 @@ python3 CalcVelDist_light.py -m_x M_X -sigma_p SIGMA_P -loc LOCATION -int INTERA
 ```
 where in this case, the possible interactions are "SI" (spin-independent), "hm" (heavy dark photon mediator) and "ulm" (ultra-light dark photon mediator).
 
-It should be straightforward to dig into the internals of the `CalcVelDist_function.py` script to adjust the grid of gamma and v that you want to use.
+Both of the scripts above will save a file into `results/veldists`. You can read in the file and plot the resulting velocity distributions using the script `plotting/PlotVelDists.py`.
+
+It should also be straightforward to dig into the internals of the `CalcVelDist_function.py` script to adjust the grid of gamma and v that you want to use.
 
 ### Other examples
 

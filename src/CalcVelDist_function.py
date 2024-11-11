@@ -106,6 +106,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
         
     #Loop over gamma values
     N_gamma = 21
+    #N_gamma = 3
     
     Nv1 = 20 #Near the velocity threshold
     Nv2 = 15 #Everywhere else
@@ -162,24 +163,21 @@ def calcVelDist_light(m_x, sigma_p, loc, interaction, depth = 0):
     verne_light.Tabulate_Column_Density(depth, target)
             
     #Loop over gamma values
-    N_gamma = 25
-    Nv1 = 49 #Near the velocity threshold
-    Nv2 = 50 #Everywhere else
-    Nv = Nv1 + Nv2  + 1 + 1 #Add an extra one for 20 km/s
+    N_gamma = 41
+    N_v = 100
+    
+    #Divide into two velocity grids (higher resolution at higher speeds)
+    Nv1 = int(N_v/2) #Near the velocity threshold
+    Nv2 = N_v - Nv1 #Everywhere else
             
     v_th = 20e0 #Lowest speed to consider
     vmax = MB.ve + MB.vesc
     
     def getVelDist(gamma):
         
-        #Generate a list of sampling values for v (with some very close to v_th)
-        #vlist = np.geomspace(v_th, 0.25*vmax, Nv1)    
-        #vlist = np.append(vlist, np.linspace(0.15*vmax, 0.89*vmax, Nv2)) 
-        #vlist = np.append(vlist, np.linspace(0.9*vmax, 0.9999*vmax, Nv3)) 
-        
+        #Generate a list of sampling values for v (with denser sampling at high speeds)      
         vlist = np.linspace(v_th, 0.84*vmax, Nv1)
         vlist = np.append(vlist, np.linspace(0.85, 1.0, Nv2)*vmax)
-        vlist = np.append(vlist, 0.99*v_th)
         vlist = np.sort(vlist)
         
         f_final = 0.0*vlist
@@ -188,21 +186,17 @@ def calcVelDist_light(m_x, sigma_p, loc, interaction, depth = 0):
             f_refl = verne_light.CalcF_reflected(vlist[i], gamma, sigma_p, m_x, target, interaction)
             f_final[i] = f_trans + f_refl
     
-        #Add on the final point
-        vlist = np.append(vlist, vmax)
-        f_final = np.append(f_final, 0.0)
-    
         return vlist, f_final
     
     gamma_list = np.linspace(0, 1, N_gamma)
     gamma_list[0] = 1e-3
     gamma_list[-1] = 1 - 1e-3
 
-    gamma_rep = np.repeat(gamma_list, Nv)
+    gamma_rep = np.repeat(gamma_list, N_v)
 
-    vgrid = np.zeros((N_gamma, Nv))
-    fgrid = np.zeros((N_gamma, Nv))
-    fgrid_withrefl = np.zeros((N_gamma, Nv))
+    vgrid = np.zeros((N_gamma, N_v))
+    fgrid = np.zeros((N_gamma, N_v))
+    fgrid_withrefl = np.zeros((N_gamma, N_v))
     for j in tqdm(range(N_gamma), desc='Calculating velocity distribution'):
         #print(">Calculating for gamma/pi = ", gamma_list[j],"...")
         vgrid[j,:], fgrid[j,:] = getVelDist(gamma_list[j]*np.pi)

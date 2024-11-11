@@ -102,7 +102,7 @@ def Tabulate_Column_Density(depth, target="full"):
         elif (target == "earth"):
             d1 = pathLength(depth, theta) - pathLength_Earth(depth, theta)
             d2 = pathLength(depth, theta)
-            d_vec = np.linespace(d1, d2, 100)
+            d_vec = np.linspace(d1, d2, 100)
         elif (target == "full"):
             d1 = 0
             ds = pathLength(depth, theta) - pathLength_Earth(depth, theta)
@@ -178,7 +178,7 @@ def Calc_p_refl_grid(thetas, v, sigma_p, m_x, target, interaction="SI"):
         #Distance to the detector divided by mean free path (averaged over trajectory)
         L1_over_lmbda_avg = inv_mean_free_path_avg_r(thetas[i], params)
         expL1 = np.exp(-L1_over_lmbda_avg)
-        P2_L1 = L1_over_lmbda_avg/2*expL1 - expL1/4 + expL1**3/4
+        P2_L1 = L1_over_lmbda_avg/2*expL1 - expL1/4 + expL1**3/4 #VERIFIED
         P0_L1 = expL1
 
         p_refl[i] = (1-P0_L2-P2_L2)*(P0_L1+P2_L1)

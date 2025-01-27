@@ -8,7 +8,12 @@ Contact: Bradley Kavanagh, bradkav@gmail.com
 """
 
 import numpy as np
-from scipy.integrate import quad, simps
+from scipy.integrate import quad
+try:
+    from scipy.integrate import simps
+except ImportError:
+    from scipy.integrate import simpson as simps
+
 from scipy.interpolate import interp1d, interp2d
 from scipy.integrate import odeint
 

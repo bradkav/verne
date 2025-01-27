@@ -14,7 +14,7 @@ phi_interp = None
 
 vesc = 544.0 #Escape velocity
 sigmav = 156.0#238/np.sqrt(2) #156.0  #Velocity dispersion (v_0/sqrt(2))
-ve = 232.0#263.0 #232.0  #Earth peculiar velocity around GC
+ve = 263.0#263.0 #232.0  #Earth peculiar velocity around GC
 
 
 # Nesc - normalisation constant
@@ -32,7 +32,7 @@ def loadPhiInterp():
     global phi_interp
     curr_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
     fname = curr_dir + "../data/PhiIntegrals.dat"
-    xvals = np.linspace(-8, 8, 1001)
+    xvals = np.linspace(-10, 10, 1001)
     phivals = np.linspace(0, np.pi, 501)
     xlen = len(xvals)
     ylen = len(phivals)
@@ -62,7 +62,7 @@ def loadPhiInterp():
 loadPhiInterp()
 
 def IntegralOverPhi(x, phi_max):
-    if (np.abs(x) > 8):
+    if (np.abs(x) > 10):
         print(x, phi_max)
         assert 1 == 0
     if (phi_max <= 0):
@@ -75,6 +75,8 @@ def IntegralOverPhi(x, phi_max):
 
 def IntegralOverPhiVec(x, phi_max):
     if hasattr(phi_max, "__len__"):
+        if (np.sum(np.abs(x) > 10) > 0):
+            raise ValueError("Values of x in IntegralOverPhiVec exceeds tabulated values. Retabulate!")
         result = np.zeros(len(phi_max))
         inds = phi_max >= np.pi
         result[inds] = 2.0*np.pi*scipy.special.i0(x[inds])
@@ -147,7 +149,7 @@ def calcf_SHM(v):
     a = (v <= vesc-ve)
     f[a] = np.exp(-(v[a]**2 + ve**2)/(2.0*sigmav**2))*(np.exp(beta*v[a])-np.exp(-beta*v[a]))
     
-    b = (vesc-ve < v)&(v < vesc+ve)
+    b = (vesc-ve < v) & (v < vesc+ve)
     f[b] = np.exp(-(v[b]**2 + ve**2)/(2.0*sigmav**2))*(np.exp(beta*v[b]) - np.exp((v[b]**2 + ve**2 -vesc**2)/(2*sigmav**2)))
     return f*v*N1/beta
 

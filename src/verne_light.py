@@ -73,6 +73,7 @@ def ERmax(mX, mA, v):
 #velocity distribution and isodetection angle
 def generate_theta_grid(v, gamma):
    fudge = 1e-6
+   #fudge = 0
     
    A = (MB.vesc**2 - v**2 - MB.ve**2)/(2*(v + fudge)*MB.ve)
    A = np.clip(A, -1, 1)
@@ -87,7 +88,7 @@ def generate_theta_grid(v, gamma):
    thetas = theta_min + 0.5*(np.cos(x_list[::-1]) + 1)*(theta_max - theta_min)
    
    return thetas
-    
+   
 
 def Tabulate_Column_Density(depth, target="full"):
     global X_grid

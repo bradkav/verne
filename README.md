@@ -56,6 +56,7 @@ as well as citing the original paper, [arXiv:1712.04901](https://arxiv.org/abs/1
 
 The `verne` code has been used (in some form or another) in the follow research papers:
 
+- *First Limits on Light Dark Matter Interactions in a Low Threshold Two Channel Athermal Phonon Detector from the TESSERACT Collaboration*, Chang et al. (TESSERACT Collaboration), [arXiv:2503.03683](https://arxiv.org/abs/2503.03683)  
 - *Search for Daily Modulation of MeV Dark Matter Signals with DAMIC-M*, I. Arnquist et al. (DAMIC-M Collaboration), [arXiv:2307.07251](https://arxiv.org/abs/2307.07251)  
 - *Dark Matter from Monogem*, C. Cappiello et al., [arXiv:2210.09448](https://arxiv.org/abs/2210.09448)  
 - *Light dark matter accumulating in planets: Nuclear scattering*, J. Bramante et al., [arXiv:2210.01812](https://arxiv.org/abs/2210.01812) 

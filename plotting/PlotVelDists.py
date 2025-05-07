@@ -12,7 +12,7 @@ matplotlib.rc('font', **font)
 import matplotlib.pyplot as plt
 #------------------------
 
-def MakePlot(filename, N_gamma, N_v, logy = False):
+def MakePlot(filename, N_gamma, N_v, logy = False, outfile="../plots/VelDist.pdf"):
     
     #Load velocity distributions and reshape
     _gammas, _vs, _fs = np.loadtxt(filename, unpack=True)
@@ -54,8 +54,14 @@ def MakePlot(filename, N_gamma, N_v, logy = False):
 
     plt.legend(loc='best')
 
-    plt.savefig("../plots/VelDist.pdf")
+    plt.savefig(outfile, bbox_inches='tight')
     plt.show()
-    
-filename = "f_light_hm_full_mx10.0000MeV_lsig-34.38.txt"
-MakePlot("../results/veldists/" + filename, N_gamma=41, N_v=100, logy = False)
+
+#fileID = "ulm_full_mx0.00100_lsig-27.00"
+fileID = "ulm_full_mx0.00100_lsig-26.06"
+filename = f"f_{fileID}.txt"
+#filename  = "f_light_ulm_full_mx0.5000MeV_lsig-30.38.txt"
+outfile = f"../plots/VelDist_{fileID}.pdf"
+MakePlot("../results/veldists/" + filename, N_gamma=21, N_v=61, logy = False, outfile=outfile + ".pdf")
+
+MakePlot("../results/veldists/" + filename, N_gamma=21, N_v=61, logy = True, outfile=outfile + "_log.pdf")

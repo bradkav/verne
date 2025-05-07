@@ -10,7 +10,7 @@ Then you need to do some initialisation:
 
 `verne.loadFFcorrections(m_x)` - this tabulates the correction factors due to Nuclear form factors. It must be reloaded for each new DM mass you want to calculate for.
 
-Note that there is a hard-coded flag `NEGLECT_FF` which you can set to true to neglect corrections due to form factors (which should be valid for low-mass DM). 
+Note that there is a hard-coded flag `NEGLECT_FF` which you can set to true to neglect corrections due to form factors for SI scattering (which should be valid for low-mass DM). 
 
 
 ### Light Dark Matter
@@ -35,7 +35,7 @@ where
    - `M_X` is the DM mass in GeV  
   - `SIGMA_P` is the DM-nucleon cross section in cm^2  
   - `LOCATION` is the detector location, which can be "surface" or a number of other underground locations (e.g. "SUF" for Underground Facility, "MPI" for Max Planck Institute Munich, "MOD" for Modane, ...)
-  - `INTERACTION` is the type of the type of interaction, either "SI" (Spin-independent),  "SD" (spin-dependent)
+  - `INTERACTION` is the type of the type of interaction, either "SI" (Spin-independent),  "SD" (spin-dependent), "hm" (heavy dark photon mediator), "ulm" (ultra-light dark photon mediator)
 
 Note that this will save a file into `results/veldists` and will probably take a few minutes on a single core. The integration parameters which control the speed and precision of the calculations (`TOL` and `NSTEP`) can be updated near the top of the `verne.py` module. The script `CalcVelDist.py` is actually just a command-line wrapper for the function in `CalcVelDist_function.py`, which may be useful if you want to call this from another python script.
 

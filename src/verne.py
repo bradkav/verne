@@ -46,7 +46,7 @@ def odeint_new(f, v0, t_span , args, mxstep, rtol):
 NEGLECT_FF = False
 
 if (NEGLECT_FF == True):
-    print("> verne.py: Neglecting form factors...")
+    print("> verne.py: Neglecting form factors in SI interactions...")
 #-------------------------------------------------------------------------------------------
 
 #Form factor corrections
@@ -75,11 +75,11 @@ def loadFFcorrections(m_x, interaction = "SI"):
         density.loadIsotopes()
     
     print("> VERNE: Calculating Form Factor corrections for m_x = ", m_x, " GeV, with " + interaction + " interactions...")
-    corr_interp = [calcFFcorrection(m_x, density.Avals[ID], interaction) for ID in range(density.Niso_full)]
+    corr_interp = [calcFFcorrection(m_x, density.Avals[ID], density.Zvals[ID], interaction) for ID in range(density.Niso_full)]
     #Also need Lead + Copper, for the shielding
-    corr_Pb = calcFFcorrection(m_x, 207, interaction) 
-    corr_Cu = calcFFcorrection(m_x, 63.5, interaction)
-    corr_Fe = calcFFcorrection(m_x, 55.8, interaction)
+    corr_Pb = calcFFcorrection(m_x, 207, 82, interaction) 
+    corr_Cu = calcFFcorrection(m_x, 63.5, 29, interaction)
+    corr_Fe = calcFFcorrection(m_x, 55.8, 26, interaction)
     
     
 #Path length [m], as measured from the top of the atmosphere to the detector 
@@ -127,15 +127,48 @@ def calcSIFormFactor(E, A0):
         F = 3*J1/x
         return (F**2)*(np.exp(-(q2*s)**2))
 
+def calcDPFormFactor(E, A0, Z, interaction):
+        #Helm
+        #if (E < 1e-5):
+        #   return 1.0
 
-def FFcorrection_integrand(x, v, m_x, A0, interaction="SI"):
+        #Define conversion factor from amu-->keV
+        amu = 931.5*1e3
+
+        #Convert recoil energy to momentum transfer q in keV
+        q1 = np.sqrt(2*A0*amu*E)
+
+        #Convert q into fm^-1
+        q2 = q1*(1e-12/1.97e-7)
+        
+        m_e = 511 #Electron mass in keV
+        alpha = 1/137.03 #Fine structure constant
+        qref = alpha*m_e
+        
+        if (interaction == "hm"):
+            F_DM_sq = 1.0
+        elif (interaction == "ulm"):
+            F_DM_sq = qref**4/q1**4
+            
+        a0 = 52917.7249 #fm
+        a = 1/4*(9*np.pi**2/(2*Z))**(1/3)*a0#/keVfm_1
+        aq = a*q2
+        
+        F_A = aq**2/(1 + aq**2)
+        F_A_sq = F_A**2
+        
+        return F_DM_sq*F_A_sq
+
+def FFcorrection_integrand(x, v, m_x, A0, Z, interaction="SI"):
     if (interaction.lower() == "SI".lower()):
         return 2.0*x*calcSIFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0)
+    elif (interaction.lower() in ["hm", "ulm"]):
+        return 2.0*x*calcDPFormFactor(x*ERmax(m_x, 0.9315*A0, v), A0, Z, interaction)
     else:
         return 1.0
 
-def calcFFcorrection(m_x, A0, interaction = "SI"):
-    if (NEGLECT_FF):
+def calcFFcorrection(m_x, A0, Z, interaction = "SI"):
+    if (NEGLECT_FF and interaction == "SI"):
         return lambda x: 1.0
     
     v_vals = np.linspace(0.001, 1000, 200)
@@ -146,7 +179,7 @@ def calcFFcorrection(m_x, A0, interaction = "SI"):
     for i, v in enumerate(v_vals):
         
         if (x_min < x_max):
-            corr_fact[i] = quad(lambda x: FFcorrection_integrand(x, v, m_x, A0, interaction), x_min, x_max)[0]
+            corr_fact[i] = quad(lambda x: FFcorrection_integrand(x, v, m_x, A0, Z, interaction), x_min, x_max)[0]
         else:
             corr_fact[i] = 0.0
             
@@ -178,6 +211,10 @@ def effectiveXS(sigma_p, m_X, A, Z, v, interaction="SI"):
             C = (4./3.)*((J_N + 1)/J_N)*S**2
         else:
             C = 0.0
+            
+    elif (interaction.lower() in ["ulm", "hm"]):
+        C = Z**2
+        
     else:
         raise ValueError("Cross sections only defined for interactions: 'SI', 'SD', ...")
     
@@ -250,7 +287,7 @@ def dv_by_dD(v, D, params):
     for i in isovals:
         #Only include a relevant form factor correction for spin-independent interactions
         #If another interaction is added which needs a form factor, add the correction here!
-        if (interaction.lower() in ["SI".lower(),]):
+        if (interaction.lower() in ["SI".lower(), "hm", "ulm"]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -270,7 +307,7 @@ def dv_by_dD_concrete(v, D, params):
     #Loop over the relevant isotopes                              
     for i in isovals:
         #print(i, dens_interp(i, r))
-        if (interaction.lower() in ["SI".lower(),]):
+        if (interaction.lower() in ["SI".lower(), "hm", "ulm"]):
             FF_correction = corr_interp[i](v)
         else:
             FF_correction = 1.0
@@ -287,7 +324,7 @@ def dv_by_dD_Pb(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(),]):
+    if (interaction.lower() in ["SI".lower(), "hm", "ulm"]):
         FF_correction = corr_Pb(v)
     else:
         FF_correction = 1.0
@@ -305,7 +342,7 @@ def dv_by_dD_Cu(v, D, params):
         
     sigma_p, m_x, interaction = params
     
-    if (interaction.lower() in ["SI".lower(),]):
+    if (interaction.lower() in ["SI".lower(), "hm", "ulm"]):
         FF_correction = corr_Cu(v)
     else:
         FF_correction = 1.0
@@ -322,7 +359,7 @@ def dv_by_dD_Fe(v, D, params):
     Z_Fe = 26
 
     sigma_p, m_x, interaction = params
-    if (interaction.lower() in ["SI".lower(),]):
+    if (interaction.lower() in ["SI".lower(), "hm", "ulm"]):
         FF_correction = corr_Fe(v)
     else:
         FF_correction = 1.0

@@ -13,6 +13,7 @@ The core of the code (the `verne` and `verne_light` modules) is in the [src](src
 
 ### Version history
 
+**Version 2.1 (07/05/2025):** Added ultra-light and heavy dark photon interactions for the original `verne.py` calculations.
 **Version 2.0.1 (27/01/2025):** Fixed a minor bug related to interpolation of integrals over phi (extended interpolation range). 
 **Version 2.0 (28/10/2024):** Major update to include support for light Dark Matter (see `verne_light.py`), as well as some restructing of the code. Dark-photon mediated interactions are currently only supported in `verne_light.py`.  
 **Version 1.3.1 (13/10/2022):** Minor update to include interactions mediated by a heavy Dark Photon.  

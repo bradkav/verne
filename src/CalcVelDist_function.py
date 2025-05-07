@@ -19,7 +19,7 @@ results_dir = "results/"
 
 def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     
-    if (interaction not in  ["SI", "SD"]):
+    if (interaction not in  ["SI", "SD", "hm", "ulm"]):
         print(">Unknown interaction type <", interaction, ">...")
         exit()
         
@@ -42,12 +42,18 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     print(">Calculating for...")
     print(">    m_x/GeV:", m_x)
     print(">    sigma_p/cm^2:", sigma_p)
+    if (interaction in ["hm", "ulm"]):
+        m_p = 0.938
+        m_e = 0.511e-3
+        mu_p = (m_x*m_p)/(m_x + m_p)
+        mu_e = (m_x*m_e)/(m_x + m_e)
+        print(">    sigma_e/cm^2:", sigma_p*(mu_e/mu_p)**2)
     #print "        gamma/pi:", gamma_by_pi
     print(">    detector at :", loc)
     print(" ")
     
     #Initialise verne
-    verne.loadIsotopes()
+    #verne.loadIsotopes()
     verne.loadFFcorrections(m_x, interaction)
     
     #Calculate the maximum initial speed as a function of incoming angle theta
@@ -127,7 +133,7 @@ def calcVelDist_full(m_x, sigma_p, loc, interaction, depth_in = 0):
     gamma_rep = np.repeat(gamma_list, Nv)
     
     #Output to file
-    fname = results_dir + "veldists/f_" + interaction + "_" + loc + "_mx" + '{0:.3f}'.format(m_x) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
+    fname = results_dir + "veldists/f_" + interaction + "_" + loc + "_mx" + '{0:.5f}'.format(m_x) + "_lsig" + '{0:.2f}'.format(np.log10(sigma_p)) + ".txt"
     headertxt = "mx [GeV]: " + str(m_x) + "\nsigma_p [cm^2]: " + str(sigma_p) + "\ndepth [m]: " + str(depth) + "\nloc: " + target
     headertxt += "\nColumns: gamma/pi, v [km/s], f(v, gamma) [s/km]"
     

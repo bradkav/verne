@@ -129,14 +129,12 @@ def Calc_p_trans_grid(thetas, v, sigma_p, m_x, target, interaction="SI"):
         #Distance to the detector divided by mean free path (averaged over trajectory)
         L1_over_lmbda_avg = inv_mean_free_path_avg_r(thetas[i], params)
         
-        ### Transmisson probability
-        expL1 = np.exp(-L1_over_lmbda_avg)
-        P2_L1 = L1_over_lmbda_avg/2*expL1 - expL1/4 + expL1**3/4
-        P0_L1 = expL1
-        
-        p_trans[i] = (P0_L1 + P2_L1)
+        ### Transmisson probability        
+        p_trans[i] = 1/(1 + L1_over_lmbda_avg)
     
-    return p_trans
+    #return p_trans
+    #BJK: Edited 04/06/2026
+    return 0.0*thetas
 
 
 #Calculate the final speed distribution at the detector
@@ -165,6 +163,7 @@ def CalcF_transmitted(v, gamma, sigma_p, m_x, target, interaction="SI"):
 def Calc_p_refl_grid(thetas, v, sigma_p, m_x, target, interaction="SI"):
 
     p_refl = 0.0*thetas 
+    N_avg = 0.0*thetas
     
     for i in range(len(thetas)):
         params = [sigma_p, m_x, interaction, target, v]
@@ -172,22 +171,20 @@ def Calc_p_refl_grid(thetas, v, sigma_p, m_x, target, interaction="SI"):
         #Particles reflecting passed the detector
         #Distance _after passing_ the detector divided by mean free path (averaged over trajectory)
         L2_over_lmbda_avg = inv_mean_free_path_avg_r(np.pi - thetas[i], params)
-        expL2 = np.exp(-L2_over_lmbda_avg)
-        
-        ### Reflection probability
-        P2_L2 = L2_over_lmbda_avg/2*expL2 - expL2/4 + expL2**3/4
-        P0_L2 = np.exp(-L2_over_lmbda_avg)
         
         #Path before the detector
         #Distance to the detector divided by mean free path (averaged over trajectory)
         L1_over_lmbda_avg = inv_mean_free_path_avg_r(thetas[i], params)
-        expL1 = np.exp(-L1_over_lmbda_avg)
-        P2_L1 = L1_over_lmbda_avg/2*expL1 - expL1/4 + expL1**3/4 #VERIFIED
-        P0_L1 = expL1
 
-        p_refl[i] = (1-P0_L2-P2_L2)*(P0_L1+P2_L1)
+        p_refl[i] = (1/(1 + L1_over_lmbda_avg))*L2_over_lmbda_avg/(1 + L2_over_lmbda_avg)
     
-    return p_refl
+        ptot = L1_over_lmbda_avg+L2_over_lmbda_avg
+        r = L1_over_lmbda_avg/ptot
+        
+        N_avg[i] = 1 + (1-2*r)*ptot/(1 + ptot)
+    #return p_refl
+    #BJK: Edited 04/06/2026
+    return N_avg
 
 #Calculate the reflected component of the distribution at the detector
 def CalcF_reflected(v, gamma, sigma_p, m_x, target, interaction="SI"):
